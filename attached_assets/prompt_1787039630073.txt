@@ -1,0 +1,836 @@
+Build a Premium Website for Maa Gayatri Public School, Muzaffarpur
+
+You are an expert senior web designer, UX engineer, frontend developer and education-branding specialist.
+
+Your task is to design and build a complete, premium, modern, production-quality school website for:
+
+Maa Gayatri Public School (M.G.P.S.)
+
+1. VERIFIED SCHOOL INFORMATION
+
+Use the following information as the factual foundation of the website.
+
+School name
+
+Maa Gayatri Public School
+
+Short name:
+M.G.P.S.
+
+Location
+
+Purani Darbhanga Road, Sahwajpur/Shahbazpur, Muzaffarpur, Bihar – 842004, India
+
+Phone
+
++91 75199 90367
+
+Make this clickable:
+tel:+917519990367
+
+Email
+
+MGPSMUZ93@GMAIL.COM
+
+Make this clickable:
+mailto:MGPSMUZ93@gmail.com
+
+Established
+
+2013 is listed by a school directory.
+
+Do NOT present the establishment year as an officially verified fact unless the school confirms it.
+
+School type
+
+Co-educational English-medium school.
+
+Management
+
+The school is reported as being run and managed by:
+
+Maa Gayatri Educational Trust
+
+Curriculum / Board
+
+A third-party organisation profile describes the school as:
+“Based on CBSE Curriculum, New Delhi”
+
+Another directory lists the school as ICSE.
+
+Because these sources conflict, DO NOT make an unsupported definitive claim.
+
+Instead, use wording such as:
+
+“English-medium co-educational school offering structured education through the secondary level.”
+
+If a board/curriculum section is needed, write:
+
+“Curriculum information — Please contact the school for the latest board and affiliation details.”
+
+Do not invent a CBSE affiliation number, affiliation status, UDISE details, principal name, teacher names, fee structure, admission dates or facilities unless supplied by the school.
+
+Reported level
+
+A third-party organisation profile describes the school as reaching the Class 10 level.
+
+Use:
+“Education through the secondary level”
+
+rather than inventing exact class availability.
+
+---
+
+2. WEBSITE GOAL
+
+The website should make Maa Gayatri Public School look:
+
+- trustworthy
+- established
+- modern
+- safe
+- academic
+- parent-friendly
+- professional
+- locally respected
+- digitally modern
+
+The primary objective is to help parents:
+
+1. Understand the school
+2. Learn about academics
+3. See the school's environment
+4. Contact the school
+5. Enquire about admission
+6. Find the location
+7. Call/WhatsApp the school
+8. Submit an admission enquiry
+
+The website should feel like a real premium Indian private-school website, not a generic AI-generated template.
+
+---
+
+3. DESIGN DIRECTION
+
+Create a premium education aesthetic.
+
+Use:
+
+- clean white/light background
+- deep navy/royal blue as the primary brand color
+- warm gold/yellow as a subtle accent
+- excellent typography
+- large photographic sections
+- rounded cards
+- subtle shadows
+- elegant gradients
+- smooth animations
+- generous spacing
+- strong visual hierarchy
+
+Avoid:
+
+- excessive gradients
+- childish cartoon graphics
+- generic stock-template appearance
+- excessive animations
+- clutter
+- huge blocks of text
+- fake statistics
+- fake testimonials
+- fake awards
+- fake affiliations
+
+The design should communicate:
+
+“A trusted school where children learn, grow and prepare for the future.”
+
+---
+
+4. HOMEPAGE
+
+Create a highly impressive homepage.
+
+Hero section
+
+Large full-width school/education photograph.
+
+Headline:
+
+“Building Bright Futures Through Education”
+
+Subheadline:
+
+“Maa Gayatri Public School is an English-medium co-educational school in Muzaffarpur committed to providing a supportive environment for academic growth, character development and lifelong learning.”
+
+Primary CTA:
+
+“Admission Enquiry”
+
+Secondary CTA:
+
+“Explore Our School”
+
+Add a floating quick-contact bar:
+
+Call School
+WhatsApp
+Get Directions
+
+Phone:
++91 75199 90367
+
+---
+
+5. TRUST SECTION
+
+Immediately below the hero, create a clean trust/identity section.
+
+Possible items:
+
+- Established 2013
+- English Medium
+- Co-Educational
+- Secondary-Level Education
+- Supportive Learning Environment
+- Muzaffarpur
+
+Do NOT invent numerical statistics.
+
+Do not claim:
+
+“500+ students”
+
+“50+ teachers”
+
+“100% results”
+
+“20+ years experience”
+
+unless actual data is provided.
+
+---
+
+6. ABOUT THE SCHOOL
+
+Create an attractive About section.
+
+Heading:
+
+“About Maa Gayatri Public School”
+
+Content:
+
+“Maa Gayatri Public School (M.G.P.S.) is an English-medium co-educational school located on Purani Darbhanga Road in Sahwajpur, Muzaffarpur. The school focuses on creating a supportive learning environment where students can develop academically while growing in confidence, discipline and character.”
+
+Mention:
+
+- Located in Muzaffarpur
+- English-medium education
+- Co-educational environment
+- Managed by Maa Gayatri Educational Trust
+- Education through the secondary level
+
+Add:
+
+“Learn More About Our School”
+
+button.
+
+---
+
+7. VISION & MISSION
+
+Create two premium cards.
+
+Our Vision
+
+“To nurture confident, knowledgeable and responsible young individuals who are prepared to contribute positively to society.”
+
+Our Mission
+
+“To provide students with a supportive and engaging learning environment that encourages academic curiosity, discipline, creativity, character and holistic development.”
+
+These are website positioning statements.
+
+Do not claim that these are the school's official statements unless the school confirms them.
+
+---
+
+8. ACADEMICS
+
+Create a dedicated Academics section.
+
+Sections:
+
+Learning
+
+Focus on:
+
+- conceptual understanding
+- academic foundations
+- communication
+- critical thinking
+- discipline
+- curiosity
+
+Student Development
+
+Mention:
+
+- confidence
+- communication
+- teamwork
+- responsibility
+- creativity
+- problem solving
+
+Secondary Education
+
+Explain that the school provides education through the secondary level based on currently available public information.
+
+Add a note:
+
+“For the latest information regarding classes, curriculum, board affiliation and academic programmes, please contact the school.”
+
+---
+
+9. WHY CHOOSE US
+
+Create six visually attractive cards.
+
+Use:
+
+01 — Student-Centred Learning
+
+Encouraging students to understand, explore and participate.
+
+02 — English-Medium Environment
+
+Supporting effective communication and learning.
+
+03 — Holistic Development
+
+Academic learning combined with personal growth.
+
+04 — Values & Discipline
+
+Encouraging responsibility, respect and good character.
+
+05 — Supportive Environment
+
+Creating a positive atmosphere for students.
+
+06 — Community-Based Education
+
+Serving families and students in the Muzaffarpur region.
+
+Do not make unsupported claims about specific facilities.
+
+---
+
+10. CAMPUS / GALLERY
+
+Create a premium image gallery.
+
+Sections:
+
+- Campus
+- Classrooms
+- Activities
+- Students
+- Events
+- Learning Environment
+
+IMPORTANT:
+
+Do not fabricate school photographs.
+
+If actual school images are unavailable, create elegant image placeholders with labels:
+
+“Campus Photo”
+“Classroom Photo”
+“School Activity”
+etc.
+
+Make it easy for the administrator to replace these images later.
+
+Add a CMS/content structure so the school can update photos.
+
+---
+
+11. ADMISSIONS
+
+Create a high-conversion Admission section.
+
+Headline:
+
+“Give Your Child a Strong Start”
+
+Content:
+
+“Interested in Maa Gayatri Public School? Contact the school to learn about current admissions, available classes, requirements and important dates.”
+
+CTA:
+
+“Start Admission Enquiry”
+
+Create an enquiry form containing:
+
+- Parent/Guardian Name
+- Student Name
+- Student's Current Class
+- Class Seeking Admission
+- Phone Number
+- Email
+- Message
+
+Submit button:
+
+“Send Admission Enquiry”
+
+The form should be designed so it can later connect to:
+
+- email
+- WhatsApp
+- backend API
+- Google Sheets
+- CRM
+
+Do not pretend the form is functional if no backend is configured.
+
+---
+
+12. CONTACT SECTION
+
+Create a strong contact section.
+
+Address
+
+Maa Gayatri Public School
+Purani Darbhanga Road,
+Sahwajpur/Shahbazpur,
+Muzaffarpur, Bihar – 842004, India
+
+Phone
+
++91 75199 90367
+
+Email
+
+MGPSMUZ93@gmail.com
+
+Buttons:
+
+“Call Now”
+“WhatsApp”
+“Get Directions”
+
+Embed a Google Maps location if the correct school location can be verified.
+
+Do NOT use a guessed map coordinate.
+
+---
+
+13. SCHOOL HOURS
+
+Public listings currently contain inconsistent opening-hour information.
+
+Therefore do NOT hard-code hours as official school hours.
+
+Instead display:
+
+“School Office Hours — Please contact the school for current timings.”
+
+Allow the administrator to update the hours later.
+
+---
+
+14. GOOGLE / LOCAL SEO
+
+Optimize the website for local searches such as:
+
+- Maa Gayatri Public School Muzaffarpur
+- Maa Gayatri Public School Sahwajpur
+- schools in Muzaffarpur
+- English medium school in Muzaffarpur
+- school near Sahwajpur
+- public school in Muzaffarpur
+- secondary school Muzaffarpur
+
+Create proper:
+
+- title tags
+- meta descriptions
+- Open Graph tags
+- canonical URL
+- sitemap.xml
+- robots.txt
+- LocalBusiness/School structured data where appropriate
+- Organization schema
+- Breadcrumb schema
+
+Do not add fake ratings or fake reviews to structured data.
+
+---
+
+15. SEO TITLE
+
+Use something similar to:
+
+“Maa Gayatri Public School, Muzaffarpur | English-Medium School”
+
+Meta description:
+
+“Maa Gayatri Public School is an English-medium co-educational school located on Purani Darbhanga Road, Sahwajpur, Muzaffarpur. Contact us for admissions and school information.”
+
+---
+
+16. NAVIGATION
+
+Desktop navigation:
+
+Home
+About
+Academics
+Admissions
+Gallery
+Contact
+
+Add a prominent:
+
+“Admission Enquiry”
+
+button.
+
+Mobile navigation:
+
+Use a clean hamburger menu.
+
+Keep Call and WhatsApp easily accessible on mobile.
+
+---
+
+17. FLOATING MOBILE CTA
+
+On mobile, create a fixed bottom bar:
+
+☎ Call
+💬 WhatsApp
+📍 Directions
+
+Make each button functional.
+
+Phone:
++91 75199 90367
+
+---
+
+18. WHATSAPP
+
+Create a WhatsApp CTA using the school phone number.
+
+Use:
+
+https://wa.me/917519990367
+
+Suggested prefilled message:
+
+“Hello Maa Gayatri Public School, I would like to enquire about admission and school information.”
+
+Do not display the raw URL on the website.
+
+---
+
+19. FOOTER
+
+Footer should contain:
+
+Maa Gayatri Public School
+
+Purani Darbhanga Road,
+Sahwajpur/Shahbazpur,
+Muzaffarpur, Bihar – 842004
+
+Phone:
++91 75199 90367
+
+Email:
+MGPSMUZ93@gmail.com
+
+Quick Links:
+
+Home
+About
+Academics
+Admissions
+Gallery
+Contact
+
+Add:
+
+“© 2026 Maa Gayatri Public School. All Rights Reserved.”
+
+Also include:
+
+“Website designed and developed by [developer/company]”
+
+BUT leave the developer/company name configurable.
+
+---
+
+20. ADMIN / CONTENT ARCHITECTURE
+
+Structure the code so the following can easily be changed later:
+
+- school name
+- logo
+- phone
+- email
+- address
+- school photos
+- principal message
+- school history
+- curriculum
+- classes
+- admission information
+- fees
+- notices
+- events
+- gallery
+- faculty
+- facilities
+- testimonials
+- social media links
+
+Do not hard-code everything into components.
+
+Create reusable data/config objects or CMS-ready structures.
+
+---
+
+21. OPTIONAL FUTURE FEATURES
+
+Prepare architecture for:
+
+Notice Board
+
+Latest announcements.
+
+Events
+
+School events and activities.
+
+Results
+
+Academic achievements.
+
+Faculty
+
+Teacher profiles.
+
+Downloads
+
+Prospectus, admission forms, notices and documents.
+
+Student/Parent Portal
+
+Future integration only.
+
+Online Admission
+
+Future integration only.
+
+School Management System
+
+Future integration only.
+
+Do not build fake functionality.
+
+---
+
+22. SOCIAL MEDIA
+
+Do not invent social-media accounts.
+
+If official Facebook, Instagram or YouTube accounts cannot be verified, hide those buttons.
+
+Make social links configurable from one place.
+
+---
+
+23. LOGO
+
+If an official logo is available online, use it only if it can be confidently verified as belonging to this exact Muzaffarpur school.
+
+Otherwise create a temporary elegant text-based identity:
+
+MGPS
+
+Maa Gayatri Public School
+
+Do not invent an official logo.
+
+---
+
+24. IMPORTANT DATA-INTEGRITY RULE
+
+This is critical.
+
+You are building a real school's website.
+
+NEVER fabricate:
+
+- principal name
+- teacher names
+- student numbers
+- examination results
+- awards
+- CBSE affiliation number
+- ICSE affiliation
+- UDISE number unless verified
+- school ranking
+- facilities
+- transport facilities
+- hostel
+- smart classrooms
+- laboratories
+- library
+- sports facilities
+- fee amounts
+- admission dates
+- testimonials
+- reviews
+
+If information is unavailable, use:
+
+“Information coming soon”
+
+or
+
+“Contact the school for details.”
+
+---
+
+25. TECHNICAL REQUIREMENTS
+
+Build the website as a real production website.
+
+Requirements:
+
+- fully responsive
+- mobile-first
+- fast loading
+- accessible
+- SEO optimized
+- semantic HTML
+- optimized images
+- lazy loading
+- clean component architecture
+- reusable components
+- smooth but lightweight animations
+- excellent mobile UX
+- keyboard accessibility
+- proper focus states
+- proper form validation
+- error states
+- loading states
+- 404 page
+
+Target:
+
+90+ Lighthouse performance where realistically achievable.
+
+---
+
+26. VISUAL QUALITY
+
+The website must NOT look like a generic AI-generated landing page.
+
+Use:
+
+- premium spacing
+- sophisticated typography
+- editorial-style sections
+- carefully selected photography
+- subtle motion
+- excellent cards
+- polished buttons
+- visual storytelling
+- responsive layouts
+
+Make the homepage feel like a ₹50,000–₹1,00,000 professionally designed school website.
+
+---
+
+27. COPYWRITING STYLE
+
+Use professional but simple English.
+
+Target audience:
+
+Parents in Muzaffarpur.
+
+Avoid corporate jargon.
+
+Use language that communicates:
+
+Trust
+Education
+Safety
+Growth
+Discipline
+Confidence
+Future
+
+Do not overpromise.
+
+---
+
+28. FINAL HOMEPAGE STRUCTURE
+
+Build the homepage in this order:
+
+1. Announcement bar
+2. Navbar
+3. Hero
+4. Trust indicators
+5. About school
+6. Vision / Mission
+7. Academics
+8. Why Choose MGPS
+9. Campus/gallery
+10. Admission CTA
+11. Contact / map
+12. Footer
+
+---
+
+29. FINAL QUALITY CHECK
+
+Before finishing:
+
+- Verify phone number formatting.
+- Verify address.
+- Verify email.
+- Ensure every CTA works.
+- Ensure WhatsApp opens correctly.
+- Ensure Call button opens the phone dialer.
+- Ensure email opens the mail client.
+- Ensure map points to the correct school.
+- Ensure mobile navigation works.
+- Ensure no fake information exists.
+- Ensure no placeholder lorem ipsum remains.
+- Ensure no broken images.
+- Ensure forms have validation.
+- Ensure page titles and metadata exist.
+- Ensure the website is responsive at 320px, 375px, 768px, 1024px and desktop widths.
+- Ensure the site feels like a premium real school website.
+
+MOST IMPORTANT
+
+Do not simply create a template.
+
+Create a convincing, premium digital identity for Maa Gayatri Public School in Muzaffarpur that a parent would genuinely trust and that the school's management could realistically deploy as its official website.
+
+Where information is missing, design the section so it can be populated later rather than inventing facts.

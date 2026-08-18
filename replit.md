@@ -1,6 +1,6 @@
-# [Project name]
+# Maa Gayatri Public School
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+Premium, parent-friendly school website for Maa Gayatri Public School in Muzaffarpur.
 
 ## Run & Operate
 
@@ -22,23 +22,33 @@ _Replace the heading above with the project's name, and this line with one sente
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+- `artifacts/mgps-school` — the deployable responsive school website.
+- `artifacts/mgps-school/src/siteData.ts` — centralized school identity, contact details, navigation, trust indicators, and replaceable gallery content.
+- `artifacts/mgps-school/src/App.tsx` — the single-page site sections, navigation, enquiry form, contact CTAs, and not-found route.
+- `artifacts/mgps-school/src/index.css` — site theme, responsive layout, motion, and accessibility states.
+- `artifacts/mgps-school/public` — favicon, `robots.txt`, and `sitemap.xml`.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- The site is presentation-first and does not claim that the admission enquiry form is connected to a backend.
+- School facts are centralized in `siteData.ts` so approved copy, photos, contacts, and future content can be swapped without rewriting page sections.
+- Unverified details such as board affiliation, official establishment date, school hours, and location coordinates are deliberately presented with qualifying language or omitted.
+- The gallery uses clearly labeled replacement slots until approved school photographs are supplied.
 
 ## Product
 
-_Describe the high-level user-facing capabilities of this app once they exist._
+- Parents can learn about the school, academics, values, and secondary-level education.
+- Parents can call, email, message on WhatsApp, open a directions search, and start an admission enquiry.
+- The site is responsive, keyboard-accessible, SEO-ready, and designed for future CMS/backend connections.
 
 ## User preferences
 
-_Populate as you build — explicit user instructions worth remembering across sessions._
+- Keep all school information factual and avoid inventing affiliations, staff, facilities, statistics, testimonials, or photographs.
 
 ## Gotchas
 
-_Populate as you build — sharp edges, "always run X before Y" rules._
+- Use the managed web workflow for the preview; Vite expects `PORT` and `BASE_PATH` from the workflow.
+- Update `src/siteData.ts` when approved school content, images, or developer attribution becomes available.
 
 ## Pointers
 
