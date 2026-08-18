@@ -24,13 +24,14 @@ Premium, parent-friendly school website for Maa Gayatri Public School in Muzaffa
 
 - `artifacts/mgps-school` — the deployable responsive school website.
 - `artifacts/mgps-school/src/siteData.ts` — centralized school identity, contact details, navigation, trust indicators, and replaceable gallery content.
-- `artifacts/mgps-school/src/App.tsx` — the single-page site sections, navigation, enquiry form, contact CTAs, and not-found route.
+- `artifacts/mgps-school/src/App.tsx` — the page routes, shared navigation/footer, enquiry form, contact CTAs, and not-found route.
 - `artifacts/mgps-school/src/index.css` — site theme, responsive layout, motion, and accessibility states.
 - `artifacts/mgps-school/public` — favicon, `robots.txt`, and `sitemap.xml`.
 
 ## Architecture decisions
 
-- The site is presentation-first and does not claim that the admission enquiry form is connected to a backend.
+- The site is presentation-first and uses separate routes for Home, About, Academics, Admissions, Gallery, and Contact.
+- The admission enquiry form does not claim to be connected to a backend.
 - School facts are centralized in `siteData.ts` so approved copy, photos, contacts, and future content can be swapped without rewriting page sections.
 - Unverified details such as board affiliation, official establishment date, school hours, and location coordinates are deliberately presented with qualifying language or omitted.
 - The gallery uses clearly labeled replacement slots until approved school photographs are supplied.

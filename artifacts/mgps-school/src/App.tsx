@@ -46,7 +46,7 @@ function scrollToTop() {
 
 function Brand() {
   return (
-    <a className="brand-mark" href="#home" data-testid="link-brand" aria-label="Maa Gayatri Public School home">
+    <a className="brand-mark" href="/" data-testid="link-brand" aria-label="Maa Gayatri Public School home">
       <span className="brand-seal" aria-hidden="true">MGPS</span>
       <span>
         <span className="brand-name">{school.name}</span>
@@ -58,12 +58,19 @@ function Brand() {
 
 function Header() {
   const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape') setOpen(false);
     };
+    const updateScrollState = () => setScrolled(window.scrollY > 10);
     window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
+    window.addEventListener('scroll', updateScrollState, { passive: true });
+    updateScrollState();
+    return () => {
+      window.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('scroll', updateScrollState);
+    };
   }, []);
 
   const closeMenu = () => setOpen(false);
@@ -76,7 +83,7 @@ function Header() {
           <a href={school.phoneHref} data-testid="link-announcement-phone">Call {school.phoneDisplay}</a>
         </div>
       </div>
-      <header className="nav-bar">
+      <header className={`nav-bar${scrolled ? ' is-scrolled' : ''}`}>
         <div className="container-wide nav-inner">
           <Brand />
           <nav className="desktop-nav" aria-label="Primary navigation">
@@ -88,7 +95,8 @@ function Header() {
           </button>
         </div>
       </header>
-      <nav id="mobile-navigation" className={`mobile-menu${open ? ' open' : ''}`} aria-label="Mobile navigation">
+      <div className="nav-placeholder" aria-hidden="true" />
+      <nav id="mobile-navigation" className={`mobile-menu${open ? ' open' : ''}${scrolled ? ' is-scrolled' : ''}`} aria-label="Mobile navigation">
         <div className="container-wide">
           {navItems.map((item) => <a href={item.href} onClick={closeMenu} key={item.href} data-testid={`link-mobile-${item.label.toLowerCase()}`}>{item.label}</a>)}
           <a className="button-primary" href="#admissions" onClick={closeMenu} data-testid="link-mobile-admission">Admission Enquiry <ChevronRight size={16} aria-hidden="true" /></a>
@@ -109,8 +117,8 @@ function Hero() {
         <h1 id="hero-title" className="display-font">Building bright futures through education.</h1>
         <p>{school.name} is an English-medium co-educational school in Muzaffarpur committed to providing a supportive environment for academic growth, character development and lifelong learning.</p>
         <div className="hero-actions">
-          <a className="button-primary" href="#admissions" data-testid="link-hero-admission">Admission Enquiry <ChevronRight size={17} aria-hidden="true" /></a>
-          <a className="button-quiet" href="#about" data-testid="link-hero-explore">Explore Our School</a>
+          <a className="button-primary" href="/admissions" data-testid="link-hero-admission">Admission Enquiry <ChevronRight size={17} aria-hidden="true" /></a>
+          <a className="button-quiet" href="/about" data-testid="link-hero-explore">Explore Our School</a>
         </div>
         <div className="hero-note"><MapPin size={14} aria-hidden="true" /> Purani Darbhanga Road · Sahwajpur, Muzaffarpur</div>
       </div>
@@ -152,7 +160,7 @@ function About() {
             <li><ShieldCheck size={17} aria-hidden="true" /> Reported management by {school.management}</li>
             <li><Layers3 size={17} aria-hidden="true" /> Education through the secondary level</li>
           </ul>
-          <a className="text-link" style={{ marginTop: 28 }} href="#beliefs" data-testid="link-about-beliefs">Learn more about our school <ChevronRight size={16} aria-hidden="true" /></a>
+          <a className="text-link" style={{ marginTop: 28 }} href="/about#beliefs" data-testid="link-about-beliefs">Learn more about our school <ChevronRight size={16} aria-hidden="true" /></a>
         </div>
         <div className="about-visual" aria-label="Editorial placeholder for approved school history or campus image">
           <div className="editorial-frame">
@@ -190,7 +198,7 @@ function Academics() {
           <div className="eyebrow">03 / Academics</div>
           <h2 className="section-heading" id="academics-title">Foundations for a curious mind.</h2>
           <p className="section-copy" style={{ marginTop: 25 }}>A thoughtful school journey gives children room to understand, practise, ask better questions and grow in confidence.</p>
-          <a className="button-primary" style={{ marginTop: 26 }} href="#contact" data-testid="link-academics-contact">Ask about academics <ChevronRight size={16} aria-hidden="true" /></a>
+           <a className="button-primary" style={{ marginTop: 26 }} href="/contact" data-testid="link-academics-contact">Ask about academics <ChevronRight size={16} aria-hidden="true" /></a>
         </div>
         <div>
           <div className="academic-board">
@@ -342,8 +350,87 @@ function MobileCta() {
   return <div className="mobile-cta" aria-label="Quick contact"><a href={school.phoneHref} data-testid="link-mobile-call"><Phone aria-hidden="true" />Call</a><a href={school.whatsappHref} target="_blank" rel="noreferrer" data-testid="link-mobile-whatsapp"><MessageCircle aria-hidden="true" />WhatsApp</a><a href={school.directionsHref} target="_blank" rel="noreferrer" data-testid="link-mobile-directions"><Compass aria-hidden="true" />Directions</a></div>;
 }
 
+function PageHeader({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  return (
+    <section className="page-hero" aria-labelledby="page-title">
+      <div className="container-wide">
+        <div className="eyebrow eyebrow-light">{eyebrow}</div>
+        <h1 id="page-title" className="section-heading">{title}</h1>
+        <p>{copy}</p>
+      </div>
+    </section>
+  );
+}
+
+function HomeWelcome() {
+  return (
+    <section className="section-pad section-band home-welcome" aria-labelledby="welcome-title">
+      <div className="container-wide home-welcome-grid">
+        <div>
+          <div className="eyebrow">01 / Start here</div>
+          <h2 className="section-heading" id="welcome-title">A steady place to begin well.</h2>
+          <div className="gold-rule" style={{ marginTop: 26 }} />
+          <p className="section-copy" style={{ marginTop: 24 }}>
+            Maa Gayatri Public School is an English-medium co-educational school in Muzaffarpur, focused on academic growth, confidence, discipline and character.
+          </p>
+          <a className="button-primary" style={{ marginTop: 26 }} href="/about" data-testid="link-home-about">About the school <ChevronRight size={16} aria-hidden="true" /></a>
+        </div>
+        <div className="home-welcome-card">
+          <div className="home-welcome-card-label">A parent’s first look</div>
+          <h3>Everything you need to take the next step.</h3>
+          <div className="home-welcome-links">
+            <a href="/academics">Explore academics <ChevronRight size={15} aria-hidden="true" /></a>
+            <a href="/gallery">See the learning environment <ChevronRight size={15} aria-hidden="true" /></a>
+            <a href="/contact">Contact the school <ChevronRight size={15} aria-hidden="true" /></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function HomeNextStep() {
+  return (
+    <section className="section-pad home-next-step" aria-labelledby="next-step-title">
+      <div className="container-wide home-next-step-grid">
+        <div>
+          <div className="eyebrow">02 / Your next step</div>
+          <h2 className="section-heading" id="next-step-title">Have a question? Start a conversation.</h2>
+        </div>
+        <div>
+          <p className="section-copy">For current admissions, classes, curriculum, requirements and office timings, please contact the school directly.</p>
+          <div className="contact-actions">
+            <a className="button-primary" href="/admissions">Admission Enquiry <ChevronRight size={16} aria-hidden="true" /></a>
+            <a className="text-link" href="/contact">Call or message the school <ChevronRight size={16} aria-hidden="true" /></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Home() {
-  return <div className="site-shell"><Header /><main><Hero /><TrustStrip /><About /><Beliefs /><Academics /><WhyChoose /><Gallery /><Admissions /><Contact /></main><Footer /><MobileCta /></div>;
+  return <div className="site-shell"><Header /><main><Hero /><TrustStrip /><HomeWelcome /><HomeNextStep /></main><Footer /><MobileCta /></div>;
+}
+
+function AboutPage() {
+  return <div className="site-shell"><Header /><main><PageHeader eyebrow="01 / The school" title="A school journey built on steady foundations." copy="Get to know Maa Gayatri Public School, its setting in Muzaffarpur and the values that shape this digital front door." /><About /><Beliefs /><WhyChoose /></main><Footer /><MobileCta /></div>;
+}
+
+function AcademicsPage() {
+  return <div className="site-shell"><Header /><main><PageHeader eyebrow="02 / Academics" title="Foundations for a curious mind." copy="Explore the learning focus, student development priorities and secondary-level education described in currently available public information." /><Academics /></main><Footer /><MobileCta /></div>;
+}
+
+function AdmissionsPage() {
+  return <div className="site-shell"><Header /><main><PageHeader eyebrow="03 / Admissions" title="Give your child a strong start." copy="Contact the school to learn about current admissions, available classes, requirements and important dates." /><Admissions /></main><Footer /><MobileCta /></div>;
+}
+
+function GalleryPage() {
+  return <div className="site-shell"><Header /><main><PageHeader eyebrow="04 / The environment" title="A visual story, ready to be filled." copy="Approved campus, classroom and activity photography can make this space truly yours. Until then, every panel is clearly marked for replacement." /><Gallery /></main><Footer /><MobileCta /></div>;
+}
+
+function ContactPage() {
+  return <div className="site-shell"><Header /><main><PageHeader eyebrow="05 / Find us" title="A conversation is the next step." copy="Reach Maa Gayatri Public School directly for the latest information about admissions, classes, curriculum, requirements and office timings." /><Contact /></main><Footer /><MobileCta /></div>;
 }
 
 function NotFound() {
@@ -352,7 +439,7 @@ function NotFound() {
 }
 
 function Router() {
-  return <ErrorBoundary><Switch><Route path="/" component={Home} /><Route component={NotFound} /></Switch></ErrorBoundary>;
+  return <ErrorBoundary><Switch><Route path="/" component={Home} /><Route path="/about" component={AboutPage} /><Route path="/academics" component={AcademicsPage} /><Route path="/admissions" component={AdmissionsPage} /><Route path="/gallery" component={GalleryPage} /><Route path="/contact" component={ContactPage} /><Route component={NotFound} /></Switch></ErrorBoundary>;
 }
 
 function App() {
