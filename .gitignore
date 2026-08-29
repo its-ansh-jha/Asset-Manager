@@ -17,6 +17,10 @@ node_modules
 !.env.example
 .vercel
 
+# Vercel build output written beside the app's public assets
+/artifacts/mgps-school/public/index.html
+/artifacts/mgps-school/public/assets/
+
 # IDEs and editors
 /.idea
 .project

@@ -48,9 +48,12 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   root: path.resolve(import.meta.dirname),
+  // Vercel is configured with `public` as its output directory.
+  // Keep the source public assets in place and write the generated site there.
+  publicDir: false,
   build: {
-    outDir: path.resolve(import.meta.dirname, 'dist/public'),
-    emptyOutDir: true,
+    outDir: path.resolve(import.meta.dirname, 'public'),
+    emptyOutDir: false,
   },
   server: {
     port,
