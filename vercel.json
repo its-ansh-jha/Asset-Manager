@@ -1,8 +1,6 @@
 {
   "version": 2,
+  "framework": null,
   "buildCommand": "pnpm --filter @workspace/mgps-school build",
-  "outputDirectory": "artifacts/mgps-school/public",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/api/:path*" }
-  ]
+  "outputDirectory": "artifacts/mgps-school/public"
 }
