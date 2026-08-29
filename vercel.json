@@ -1,6 +1,8 @@
 {
   "version": 2,
-  "framework": "vite",
   "buildCommand": "pnpm --filter @workspace/mgps-school build",
-  "outputDirectory": "public"
+  "outputDirectory": "artifacts/mgps-school/public",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "/api/:path*" }
+  ]
 }
