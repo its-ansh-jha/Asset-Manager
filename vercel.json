@@ -1,6 +1,6 @@
 {
   "version": 2,
   "framework": "vite",
-  "buildCommand": "pnpm --filter @workspace/mgps-school build",
-  "outputDirectory": "artifacts/mgps-school/public"
+  "buildCommand": "pnpm --filter @workspace/mgps-school build && mkdir -p public && cp -R artifacts/mgps-school/public/. public/",
+  "outputDirectory": "public"
 }

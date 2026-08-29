@@ -20,6 +20,7 @@ node_modules
 # Vercel build output written beside the app's public assets
 /artifacts/mgps-school/public/index.html
 /artifacts/mgps-school/public/assets/
+/public/
 
 # IDEs and editors
 /.idea
