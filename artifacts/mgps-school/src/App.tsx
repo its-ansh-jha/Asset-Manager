@@ -13,6 +13,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
   ArrowRight,
+  ArrowLeft,
   Award,
   BookOpen,
   CalendarDays,
@@ -38,6 +39,7 @@ import {
   ShieldCheck,
   Sparkles,
   Trash2,
+  Upload,
   Users,
   X,
 } from "lucide-react";
@@ -57,6 +59,7 @@ type ContentContextValue = {
   update: <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => void;
   reset: () => void;
   connected: boolean;
+  saving: boolean;
 };
 const ContentContext = createContext<ContentContextValue | null>(null);
 
@@ -64,6 +67,7 @@ function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<SiteContent>(defaultContent);
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [saving, setSaving] = useState(false);
   useEffect(() => {
     fetch("/api/site-content")
       .then((response) => {
@@ -80,6 +84,7 @@ function ContentProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!ready) return;
     const saveTimer = window.setTimeout(() => {
+      setSaving(true);
       fetch("/api/site-content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -89,7 +94,8 @@ function ContentProvider({ children }: { children: ReactNode }) {
           if (!response.ok) throw new Error("Unable to save content");
           setConnected(true);
         })
-        .catch(() => setConnected(false));
+        .catch(() => setConnected(false))
+        .finally(() => setSaving(false));
     }, 300);
     return () => window.clearTimeout(saveTimer);
   }, [content, ready]);
@@ -100,8 +106,9 @@ function ContentProvider({ children }: { children: ReactNode }) {
         setContent((current) => ({ ...current, [key]: next })),
       reset: () => setContent(defaultContent),
       connected,
+      saving,
     }),
-    [content, connected],
+    [content, connected, saving],
   );
   return (
     <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
@@ -1556,7 +1563,17 @@ function AdminNotices() {
 }
 
 function AdminGallery() {
-  const { content, update } = useContent();
+  const { content, update, saving, connected } = useContent();
+  const [uploadState, setUploadState] = useState<
+    Record<
+      string,
+      {
+        progress: number;
+        status: "reading" | "saving" | "saved" | "error";
+        message?: string;
+      }
+    >
+  >({});
   const add = () =>
     update("gallery", [
       ...content.gallery,
@@ -1574,6 +1591,96 @@ function AdminGallery() {
         item.id === id ? { ...item, [key]: value } : item,
       ),
     );
+  useEffect(() => {
+    if (saving) return;
+    setUploadState((current) =>
+      Object.fromEntries(
+        Object.entries(current).map(([id, state]) =>
+          state.status === "saving"
+            ? [
+                id,
+                {
+                  progress: connected ? 100 : 0,
+                  status: connected ? "saved" : "error",
+                  message: connected
+                    ? "Saved to database"
+                    : "Could not save — check the API",
+                },
+              ]
+            : [id, state],
+        ),
+      ),
+    );
+  }, [saving, connected]);
+  const uploadImage = (id: string, file?: File) => {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setUploadState((current) => ({
+        ...current,
+        [id]: {
+          progress: 0,
+          status: "error",
+          message: "Please choose an image file.",
+        },
+      }));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadState((current) => ({
+        ...current,
+        [id]: {
+          progress: 0,
+          status: "error",
+          message: "Please choose an image smaller than 5 MB.",
+        },
+      }));
+      return;
+    }
+    setUploadState((current) => ({
+      ...current,
+      [id]: {
+        progress: 4,
+        status: "reading",
+        message: "Reading image from device…",
+      },
+    }));
+    const reader = new FileReader();
+    reader.onprogress = (event) => {
+      if (event.lengthComputable)
+        setUploadState((current) => ({
+          ...current,
+          [id]: {
+            progress: Math.max(
+              5,
+              Math.round((event.loaded / event.total) * 90),
+            ),
+            status: "reading",
+            message: "Reading image from device…",
+          },
+        }));
+    };
+    reader.onerror = () =>
+      setUploadState((current) => ({
+        ...current,
+        [id]: {
+          progress: 0,
+          status: "error",
+          message: "The image could not be read.",
+        },
+      }));
+    reader.onload = () => {
+      edit(id, "image", String(reader.result));
+      setUploadState((current) => ({
+        ...current,
+        [id]: {
+          progress: 96,
+          status: "saving",
+          message: "Uploading to database…",
+        },
+      }));
+    };
+    reader.readAsDataURL(file);
+  };
   return (
     <div className="admin-panel">
       <AdminPanelHead
@@ -1583,8 +1690,8 @@ function AdminGallery() {
         actionLabel="Add image"
       />
       <p className="admin-help">
-        Paste a hosted image URL below. For a production version, connect this
-        to your media storage provider.
+        Choose an image from the device. It is uploaded to the database and
+        remains available after a Vercel redeploy. Images are limited to 5 MB.
       </p>
       <div className="admin-edit-list gallery-admin-list">
         {content.gallery.map((item) => (
@@ -1616,10 +1723,36 @@ function AdminGallery() {
                 </button>
               </div>
               <AdminField
-                label="Image URL"
+                label="Hosted image URL (optional)"
                 value={item.image || ""}
                 onChange={(value) => edit(item.id, "image", value)}
               />
+              <label className="upload-control">
+                <span>Upload from device</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(event) =>
+                    uploadImage(item.id, event.target.files?.[0])
+                  }
+                />
+                <span className="upload-button">
+                  <Upload size={15} /> Choose image
+                </span>
+              </label>
+              {uploadState[item.id] && (
+                <div className={`upload-status ${uploadState[item.id].status}`}>
+                  <div className="upload-status-line">
+                    <span>{uploadState[item.id].message}</span>
+                    <strong>{uploadState[item.id].progress}%</strong>
+                  </div>
+                  <div className="upload-progress">
+                    <span
+                      style={{ width: `${uploadState[item.id].progress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
               <AdminField
                 label="Title"
                 value={item.title}
@@ -1813,9 +1946,39 @@ function AdminPanelHead({
     </div>
   );
 }
+const adminTabValues: Tab[] = [
+  "overview",
+  "content",
+  "notices",
+  "gallery",
+  "admissions",
+  "people",
+];
+function getAdminTab() {
+  if (typeof window === "undefined") return "overview" as Tab;
+  const requested = new URLSearchParams(window.location.search).get(
+    "tab",
+  ) as Tab | null;
+  return requested && adminTabValues.includes(requested)
+    ? requested
+    : "overview";
+}
 function AdminDashboard() {
-  const [tab, setTab] = useState<Tab>("overview");
-  const { reset, connected } = useContent();
+  const [tab, setTabState] = useState<Tab>(getAdminTab);
+  const { reset, connected, saving } = useContent();
+  const setTab = (next: Tab) => {
+    if (next === tab) return;
+    const url = new URL(window.location.href);
+    if (next === "overview") url.searchParams.delete("tab");
+    else url.searchParams.set("tab", next);
+    window.history.pushState({ adminTab: next }, "", url);
+    setTabState(next);
+  };
+  useEffect(() => {
+    const handleBack = () => setTabState(getAdminTab());
+    window.addEventListener("popstate", handleBack);
+    return () => window.removeEventListener("popstate", handleBack);
+  }, []);
   const titles: Record<Tab, string> = {
     overview: "Overview",
     content: "Website content",
@@ -1838,7 +2001,15 @@ function AdminDashboard() {
           </a>
         </div>
         <div className="admin-breadcrumb">
-          <span>Dashboard</span>
+          {tab !== "overview" && (
+            <button
+              className="admin-back-button"
+              onClick={() => setTab("overview")}
+            >
+              <ArrowLeft size={14} /> Dashboard
+            </button>
+          )}
+          {tab === "overview" && <span>Dashboard</span>}
           <ChevronRight size={14} />
           <strong>{titles[tab]}</strong>
         </div>
@@ -1858,7 +2029,13 @@ function AdminDashboard() {
           >
             Restore sample content
           </button>
-          <span>{connected ? "Database connected · changes save automatically" : "API unavailable · reconnect the database to save changes"}</span>
+          <span>
+            {saving
+              ? "Saving changes to database…"
+              : connected
+                ? "Database connected · changes saved automatically"
+                : "API unavailable · reconnect the database to save changes"}
+          </span>
         </div>
       </main>
     </div>
