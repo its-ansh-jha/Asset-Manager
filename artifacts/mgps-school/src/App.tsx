@@ -1,55 +1,147 @@
-import { useEffect, useState, type FormEvent } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ErrorBoundary } from '@/components/error-boundary';
-import { Toaster } from '@/components/ui/toaster';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { CalendarDays, Check, ChevronRight, CircleAlert, Compass, Heart, Layers3, Mail, MapPin, Menu, MessageCircle, Phone, Send, ShieldCheck, Sparkles, Users, X } from 'lucide-react';
-import { Route, Switch, Router as WouterRouter, useLocation } from 'wouter';
-import { galleryItems, navItems, school, trustItems, whyChooseItems } from './siteData';
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import {
+  ArrowRight,
+  Award,
+  BookOpen,
+  CalendarDays,
+  Check,
+  ChevronRight,
+  CircleAlert,
+  Compass,
+  FileText,
+  GraduationCap,
+  Image as ImageIcon,
+  LayoutDashboard,
+  Layers3,
+  Mail,
+  MapPin,
+  Menu,
+  MessageCircle,
+  Pencil,
+  Phone,
+  Plus,
+  Save,
+  Send,
+  Settings,
+  ShieldCheck,
+  Sparkles,
+  Trash2,
+  Users,
+  X,
+} from "lucide-react";
+import { Route, Switch, Router as WouterRouter, useLocation } from "wouter";
+import {
+  defaultContent,
+  type Admission,
+  type GalleryItem,
+  type Notice,
+  type SiteContent,
+} from "./siteContent";
 
 const queryClient = new QueryClient();
 
-type FormValues = {
-  guardian: string;
-  student: string;
-  currentClass: string;
-  seekingClass: string;
-  phone: string;
-  email: string;
-  message: string;
+type ContentContextValue = {
+  content: SiteContent;
+  update: <K extends keyof SiteContent>(key: K, value: SiteContent[K]) => void;
+  reset: () => void;
+  connected: boolean;
 };
+const ContentContext = createContext<ContentContextValue | null>(null);
 
-const initialForm: FormValues = {
-  guardian: '',
-  student: '',
-  currentClass: '',
-  seekingClass: '',
-  phone: '',
-  email: '',
-  message: '',
-};
-
-function iconFor(name: string) {
-  switch (name) {
-    case 'calendar': return CalendarDays;
-    case 'book': return Sparkles;
-    case 'users': return Users;
-    case 'layers': return Layers3;
-    case 'heart': return Heart;
-    default: return MapPin;
-  }
+function ContentProvider({ children }: { children: ReactNode }) {
+  const [content, setContent] = useState<SiteContent>(defaultContent);
+  const [ready, setReady] = useState(false);
+  const [connected, setConnected] = useState(false);
+  useEffect(() => {
+    fetch("/api/site-content")
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load content");
+        return response.json() as Promise<SiteContent>;
+      })
+      .then((remoteContent) => {
+        setContent({ ...defaultContent, ...remoteContent });
+        setConnected(true);
+      })
+      .catch(() => setConnected(false))
+      .finally(() => setReady(true));
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
+    const saveTimer = window.setTimeout(() => {
+      fetch("/api/site-content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(content),
+      })
+        .then((response) => {
+          if (!response.ok) throw new Error("Unable to save content");
+          setConnected(true);
+        })
+        .catch(() => setConnected(false));
+    }, 300);
+    return () => window.clearTimeout(saveTimer);
+  }, [content, ready]);
+  const value = useMemo(
+    () => ({
+      content,
+      update: <K extends keyof SiteContent>(key: K, next: SiteContent[K]) =>
+        setContent((current) => ({ ...current, [key]: next })),
+      reset: () => setContent(defaultContent),
+      connected,
+    }),
+    [content, connected],
+  );
+  return (
+    <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
+  );
 }
 
+function useContent() {
+  const value = useContext(ContentContext);
+  if (!value) throw new Error("useContent must be used inside ContentProvider");
+  return value;
+}
 function scrollToTop() {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
+const publicNav = [
+  ["Home", "/"],
+  ["About Us", "/about"],
+  ["Academics & Classes", "/academics"],
+  ["Faculty & Staff", "/faculty"],
+  ["Notices", "/notices"],
+  ["Gallery", "/gallery"],
+  ["Achievements", "/achievements"],
+  ["Facilities", "/facilities"],
+  ["Contact", "/contact"],
+];
 
 function Brand() {
+  const { content } = useContent();
   return (
-    <a className="brand-mark" href="/" data-testid="link-brand" aria-label="Maa Gayatri Public School home">
-      <span className="brand-seal" aria-hidden="true">MGPS</span>
+    <a
+      className="brand-mark"
+      href="/"
+      aria-label={`${content.schoolName} home`}
+    >
+      <span className="brand-seal" aria-hidden="true">
+        MGPS
+      </span>
       <span>
-        <span className="brand-name">{school.name}</span>
+        <span className="brand-name">{content.schoolName}</span>
         <span className="brand-caption">Muzaffarpur · Bihar</span>
       </span>
     </a>
@@ -57,117 +149,236 @@ function Brand() {
 }
 
 function Header() {
+  const { content } = useContent();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-    };
-    const updateScrollState = () => setScrolled(window.scrollY > 10);
-    window.addEventListener('keydown', closeOnEscape);
-    window.addEventListener('scroll', updateScrollState, { passive: true });
-    updateScrollState();
-    return () => {
-      window.removeEventListener('keydown', closeOnEscape);
-      window.removeEventListener('scroll', updateScrollState);
-    };
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  const closeMenu = () => setOpen(false);
-
   return (
     <>
-      <div className="announcement" data-testid="banner-announcement">
+      <div className="announcement">
         <div className="container-wide announcement-inner">
-          <span><ShieldCheck size={14} aria-hidden="true" /> A considered beginning for every child</span>
-          <a href={school.phoneHref} data-testid="link-announcement-phone">Call {school.phoneDisplay}</a>
+          <span>
+            <ShieldCheck size={14} /> {content.tagline}
+          </span>
+          <a href={`tel:${content.phone.replace(/\D/g, "")}`}>
+            Call {content.phone}
+          </a>
         </div>
       </div>
-      <header className={`nav-bar${scrolled ? ' is-scrolled' : ''}`}>
+      <header className={`nav-bar${scrolled ? " is-scrolled" : ""}`}>
         <div className="container-wide nav-inner">
           <Brand />
           <nav className="desktop-nav" aria-label="Primary navigation">
-            {navItems.map((item) => <a className="nav-link" href={item.href} key={item.href} data-testid={`link-nav-${item.label.toLowerCase()}`}>{item.label}</a>)}
+            {publicNav.map(([label, href]) => (
+              <a className="nav-link" href={href} key={href}>
+                {label}
+              </a>
+            ))}
           </nav>
-          <a className="button-primary desktop-admission" href="#admissions" data-testid="link-nav-admission">Admission Enquiry <ChevronRight size={16} aria-hidden="true" /></a>
-          <button className="menu-toggle" type="button" aria-expanded={open} aria-controls="mobile-navigation" aria-label={open ? 'Close navigation menu' : 'Open navigation menu'} onClick={() => setOpen(!open)} data-testid="button-mobile-menu">
-            {open ? <X size={19} aria-hidden="true" /> : <Menu size={19} aria-hidden="true" />}
+          <a className="button-primary desktop-admission" href="/admissions">
+            Admission Enquiry <ChevronRight size={16} />
+          </a>
+          <button
+            className="menu-toggle"
+            type="button"
+            aria-expanded={open}
+            onClick={() => setOpen(!open)}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+          >
+            {open ? <X size={19} /> : <Menu size={19} />}
           </button>
         </div>
       </header>
       <div className="nav-placeholder" aria-hidden="true" />
-      <nav id="mobile-navigation" className={`mobile-menu${open ? ' open' : ''}${scrolled ? ' is-scrolled' : ''}`} aria-label="Mobile navigation">
+      <nav
+        className={`mobile-menu${open ? " open" : ""}${scrolled ? " is-scrolled" : ""}`}
+        aria-label="Mobile navigation"
+      >
         <div className="container-wide">
-          {navItems.map((item) => <a href={item.href} onClick={closeMenu} key={item.href} data-testid={`link-mobile-${item.label.toLowerCase()}`}>{item.label}</a>)}
-          <a className="button-primary" href="#admissions" onClick={closeMenu} data-testid="link-mobile-admission">Admission Enquiry <ChevronRight size={16} aria-hidden="true" /></a>
+          {publicNav.map(([label, href]) => (
+            <a href={href} onClick={() => setOpen(false)} key={href}>
+              {label}
+            </a>
+          ))}
+          <a
+            className="button-primary"
+            href="/admissions"
+            onClick={() => setOpen(false)}
+          >
+            Admission Enquiry <ChevronRight size={16} />
+          </a>
         </div>
       </nav>
     </>
   );
 }
 
-function Hero() {
+function phoneHref(phone: string) {
+  return `tel:${phone.replace(/\D/g, "")}`;
+}
+function whatsappHref(phone: string) {
+  return `https://wa.me/${phone.replace(/\D/g, "")}?text=Hello%20Maa%20Gayatri%20Public%20School`;
+}
+function mapHref(address: string) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
+}
+function Icon({ name, size = 20 }: { name: string; size?: number }) {
+  const icons: Record<string, typeof BookOpen> = {
+    book: BookOpen,
+    sparkles: Sparkles,
+    shield: ShieldCheck,
+    map: MapPin,
+    award: Award,
+    calendar: CalendarDays,
+    layers: Layers3,
+    users: Users,
+  };
+  const Component = icons[name] || Sparkles;
+  return <Component size={size} aria-hidden="true" />;
+}
+
+function PageHeader({
+  eyebrow,
+  title,
+  copy,
+}: {
+  eyebrow: string;
+  title: string;
+  copy: string;
+}) {
   return (
-    <section className="hero" id="home" aria-labelledby="hero-title">
+    <section className="page-hero">
+      <div className="container-wide">
+        <div className="eyebrow eyebrow-light">{eyebrow}</div>
+        <h1 className="section-heading">{title}</h1>
+        <p>{copy}</p>
+      </div>
+    </section>
+  );
+}
+
+function Hero() {
+  const { content } = useContent();
+  return (
+    <section className="hero" id="home">
       <div className="hero-art" aria-hidden="true">
-        <span className="hero-art-label">Approved school photography can be added here</span>
+        <span className="hero-art-label">
+          A welcoming place to learn, grow and belong
+        </span>
       </div>
       <div className="container-wide hero-content">
         <div className="hero-kicker">A school for the road ahead</div>
-        <h1 id="hero-title" className="display-font">Building bright futures through education.</h1>
-        <p>{school.name} is an English-medium co-educational school in Muzaffarpur committed to providing a supportive environment for academic growth, character development and lifelong learning.</p>
+        <h1 className="display-font">{content.heroTitle}</h1>
+        <p>{content.heroCopy}</p>
         <div className="hero-actions">
-          <a className="button-primary" href="/admissions" data-testid="link-hero-admission">Admission Enquiry <ChevronRight size={17} aria-hidden="true" /></a>
-          <a className="button-quiet" href="/about" data-testid="link-hero-explore">Explore Our School</a>
+          <a className="button-primary" href="/admissions">
+            Online Admission Enquiry <ChevronRight size={17} />
+          </a>
+          <a className="button-quiet" href="/about">
+            Explore Our School
+          </a>
         </div>
-        <div className="hero-note"><MapPin size={14} aria-hidden="true" /> Purani Darbhanga Road · Sahwajpur, Muzaffarpur</div>
+        <div className="hero-note">
+          <MapPin size={14} /> {content.address}
+        </div>
       </div>
-      <div className="container-wide quick-contact" aria-label="Quick contact links">
-        <a href={school.phoneHref} data-testid="link-quick-call"><Phone size={16} aria-hidden="true" /> Call School</a>
-        <a href={school.whatsappHref} target="_blank" rel="noreferrer" data-testid="link-quick-whatsapp"><MessageCircle size={16} aria-hidden="true" /> WhatsApp</a>
-        <a href={school.directionsHref} target="_blank" rel="noreferrer" data-testid="link-quick-directions"><Compass size={16} aria-hidden="true" /> Get Directions</a>
+      <div className="container-wide quick-contact">
+        <a href={phoneHref(content.phone)}>
+          <Phone size={16} /> Call School
+        </a>
+        <a href={whatsappHref(content.phone)} target="_blank" rel="noreferrer">
+          <MessageCircle size={16} /> WhatsApp
+        </a>
+        <a href={mapHref(content.address)} target="_blank" rel="noreferrer">
+          <Compass size={16} /> Get Directions
+        </a>
       </div>
     </section>
   );
 }
 
 function TrustStrip() {
+  const items = [
+    ["Established", "2013"],
+    ["English Medium", "A focused learning environment"],
+    ["Co-Educational", "A school for every learner"],
+    ["Secondary Level", "Education through the secondary level"],
+    ["Supportive", "Space to learn and grow"],
+    ["Muzaffarpur", "Locally rooted in Bihar"],
+  ];
   return (
-    <section className="trust-strip" aria-label="School identity">
+    <section className="trust-strip">
       <div className="container-wide trust-grid">
-        {trustItems.map((item) => {
-          const Icon = iconFor(item.icon);
-          return <div className="trust-item" key={item.label} data-testid={`text-trust-${item.icon}`}><Icon className="trust-icon" size={19} aria-hidden="true" /><span><span className="trust-label">{item.label}</span><span className="trust-detail">{item.detail}</span></span></div>;
-        })}
+        {items.map(([label, detail], i) => (
+          <div className="trust-item" key={label}>
+            <Icon
+              name={["calendar", "book", "users", "layers", "heart", "map"][i]}
+              size={19}
+            />
+            <span>
+              <span className="trust-label">{label}</span>
+              <span className="trust-detail">{detail}</span>
+            </span>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
 
-function About() {
+function AboutSection() {
+  const { content } = useContent();
   return (
-    <section className="section-pad" id="about" aria-labelledby="about-title">
+    <section className="section-pad" id="about">
       <div className="container-wide about-grid">
         <div className="about-copy">
           <div className="eyebrow">01 / The school</div>
-          <h2 className="section-heading" id="about-title">A steady place to begin well.</h2>
+          <h2 className="section-heading">A steady place to begin well.</h2>
           <div className="gold-rule" style={{ marginTop: 26 }} />
-          <p>{school.name} (M.G.P.S.) is an English-medium co-educational school located on Purani Darbhanga Road in Sahwajpur, Muzaffarpur. The school focuses on creating a supportive learning environment where students can develop academically while growing in confidence, discipline and character.</p>
+          <p>{content.aboutCopy}</p>
           <ul className="about-list">
-            <li><MapPin size={17} aria-hidden="true" /> Located in Muzaffarpur, Bihar</li>
-            <li><Sparkles size={17} aria-hidden="true" /> English-medium education</li>
-            <li><Users size={17} aria-hidden="true" /> Co-educational environment</li>
-            <li><ShieldCheck size={17} aria-hidden="true" /> Reported management by {school.management}</li>
-            <li><Layers3 size={17} aria-hidden="true" /> Education through the secondary level</li>
+            <li>
+              <MapPin size={17} /> Located in Muzaffarpur, Bihar
+            </li>
+            <li>
+              <BookOpen size={17} /> English-medium education
+            </li>
+            <li>
+              <Users size={17} /> Co-educational environment
+            </li>
+            <li>
+              <ShieldCheck size={17} /> Supportive learning culture
+            </li>
           </ul>
-          <a className="text-link" style={{ marginTop: 28 }} href="/about#beliefs" data-testid="link-about-beliefs">Learn more about our school <ChevronRight size={16} aria-hidden="true" /></a>
+          <a className="text-link" style={{ marginTop: 28 }} href="/about">
+            Learn more about our school <ChevronRight size={16} />
+          </a>
         </div>
-        <div className="about-visual" aria-label="Editorial placeholder for approved school history or campus image">
+        <div className="about-visual">
           <div className="editorial-frame">
             <div className="frame-pattern" />
-            <div className="frame-copy"><div className="frame-number">13</div><div className="frame-label">A local school identity<br />rooted in Muzaffarpur</div></div>
+            <div className="frame-copy">
+              <div className="frame-number">13</div>
+              <div className="frame-label">
+                A local school identity
+                <br />
+                rooted in Muzaffarpur
+              </div>
+            </div>
           </div>
-          <div className="about-tag"><strong>2013</strong><span>Publicly<br />listed / reported</span></div>
+          <div className="about-tag">
+            <strong>2013</strong>
+            <span>
+              Established
+              <br />
+              school
+            </span>
+          </div>
         </div>
       </div>
     </section>
@@ -176,274 +387,1537 @@ function About() {
 
 function Beliefs() {
   return (
-    <section className="beliefs section-pad" id="beliefs" aria-labelledby="beliefs-title">
+    <section className="beliefs section-pad">
       <div className="container-wide">
         <div className="eyebrow eyebrow-light">02 / What guides us</div>
-        <h2 className="section-heading" id="beliefs-title">Learning that reaches beyond the lesson.</h2>
+        <h2 className="section-heading">
+          Learning that reaches beyond the lesson.
+        </h2>
         <div className="belief-grid" style={{ marginTop: 48 }}>
-          <article className="belief-card"><div className="belief-index">01</div><h3>Our Vision</h3><p>To nurture confident, knowledgeable and responsible young individuals who are prepared to contribute positively to society.</p></article>
-          <article className="belief-card"><div className="belief-index">02</div><h3>Our Mission</h3><p>To provide students with a supportive and engaging learning environment that encourages academic curiosity, discipline, creativity, character and holistic development.</p></article>
+          <article className="belief-card">
+            <div className="belief-index">01</div>
+            <h3>Our Vision</h3>
+            <p>
+              To nurture confident, knowledgeable and responsible young
+              individuals who are prepared to contribute positively to society.
+            </p>
+          </article>
+          <article className="belief-card">
+            <div className="belief-index">02</div>
+            <h3>Our Mission</h3>
+            <p>
+              To provide a supportive and engaging environment that encourages
+              academic curiosity, discipline, creativity, character and holistic
+              development.
+            </p>
+          </article>
         </div>
-        <p className="disclaimer">These are website positioning statements for this digital front door, not claimed as the school’s official statements.</p>
       </div>
     </section>
   );
 }
 
-function Academics() {
+function AcademicsSection() {
   return (
-    <section className="section-pad" id="academics" aria-labelledby="academics-title">
+    <section className="section-pad">
       <div className="container-wide academics-grid">
         <div className="academic-intro">
-          <div className="eyebrow">03 / Academics</div>
-          <h2 className="section-heading" id="academics-title">Foundations for a curious mind.</h2>
-          <p className="section-copy" style={{ marginTop: 25 }}>A thoughtful school journey gives children room to understand, practise, ask better questions and grow in confidence.</p>
-           <a className="button-primary" style={{ marginTop: 26 }} href="/contact" data-testid="link-academics-contact">Ask about academics <ChevronRight size={16} aria-hidden="true" /></a>
+          <div className="eyebrow">03 / Academics & classes</div>
+          <h2 className="section-heading">Foundations for a curious mind.</h2>
+          <p className="section-copy" style={{ marginTop: 25 }}>
+            A thoughtful school journey gives children room to understand,
+            practise, ask better questions and grow in confidence.
+          </p>
+          <a
+            className="button-primary"
+            style={{ marginTop: 26 }}
+            href="/contact"
+          >
+            Ask about academics <ChevronRight size={16} />
+          </a>
         </div>
         <div>
           <div className="academic-board">
-            <article className="academic-row"><h3>Learning</h3><p>Focus on conceptual understanding, academic foundations, communication, critical thinking, discipline and curiosity.</p></article>
-            <article className="academic-row"><h3>Student Development</h3><p>Encouraging confidence, communication, teamwork, responsibility, creativity and problem solving alongside academic learning.</p></article>
-            <article className="academic-row"><h3>Secondary Education</h3><p>Based on currently available public information, the school provides education through the secondary level.</p></article>
+            <article className="academic-row">
+              <h3>Primary classes</h3>
+              <p>
+                Strong foundations in language, numeracy, environmental
+                awareness, communication and joyful learning.
+              </p>
+            </article>
+            <article className="academic-row">
+              <h3>Middle classes</h3>
+              <p>
+                Building understanding, study habits, teamwork, critical
+                thinking and confidence across subjects.
+              </p>
+            </article>
+            <article className="academic-row">
+              <h3>Secondary classes</h3>
+              <p>
+                Focused subject learning, mentoring and preparation for the next
+                stage of a student’s education.
+              </p>
+            </article>
           </div>
-          <div className="academic-note"><strong>Curriculum information</strong> — Please contact the school for the latest board, affiliation, classes and academic programme details.</div>
+          <div className="academic-note">
+            <strong>Need current class details?</strong> Please contact the
+            school for the latest board, affiliation, class availability and
+            academic programme information.
+          </div>
         </div>
       </div>
     </section>
   );
 }
 
-function WhyChoose() {
+function FacultySection() {
+  const { content } = useContent();
   return (
-    <section className="choice-section section-pad" id="why-mgps" aria-labelledby="why-title">
-      <div className="container-wide choice-layout">
-        <div className="choice-intro">
-          <div className="eyebrow">04 / The MGPS difference</div>
-          <h2 className="section-heading" id="why-title">The everyday things that matter.</h2>
-          <p className="section-copy" style={{ marginTop: 25 }}>A warm, purposeful learning environment is built through small habits: attention, respect, participation and care.</p>
-        </div>
-        <div className="choice-grid">
-          {whyChooseItems.map(([title, copy], index) => <article className="choice-card" key={title} data-testid={`card-why-${index + 1}`}><div className="choice-num">0{index + 1}</div><h3>{title}</h3><p>{copy}</p></article>)}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Gallery() {
-  return (
-    <section className="section-pad" id="gallery" aria-labelledby="gallery-title">
+    <section className="section-pad section-band">
       <div className="container-wide">
-        <div className="gallery-head"><div><div className="eyebrow">05 / The environment</div><h2 className="section-heading" id="gallery-title">A visual story, ready to be filled.</h2></div><p className="section-copy">School photography will make this space truly yours. For now, each panel is clearly marked for an approved image.</p></div>
-        <div className="gallery-grid">
-          {galleryItems.map((item, index) => <div className="gallery-placeholder" key={item.label} data-testid={`placeholder-gallery-${index + 1}`}><div className="gallery-label">{item.label}<small>{item.caption}</small></div></div>)}
+        <div className="eyebrow">04 / Faculty & staff</div>
+        <h2 className="section-heading">
+          People who make school feel personal.
+        </h2>
+        <p className="section-copy" style={{ marginTop: 22 }}>
+          Our teachers and support staff help students feel seen, supported and
+          ready to participate.
+        </p>
+        <div className="people-grid">
+          {content.faculty.map((person) => (
+            <article className="person-card" key={person.id}>
+              <div className="person-avatar">{person.initials}</div>
+              <div>
+                <h3>{person.name}</h3>
+                <p>{person.role}</p>
+                <span>{person.subject}</span>
+              </div>
+            </article>
+          ))}
         </div>
-        <div className="gallery-foot"><CircleAlert size={14} aria-hidden="true" /> No school photographs have been fabricated. Replace these CMS-ready panels with approved images.</div>
+      </div>
+    </section>
+  );
+}
+
+function NoticesSection({ preview = false }: { preview?: boolean }) {
+  const { content } = useContent();
+  const notices = preview ? content.notices.slice(0, 3) : content.notices;
+  return (
+    <section className="section-pad" id="notices">
+      <div className="container-wide">
+        <div className="section-topline">
+          <div>
+            <div className="eyebrow">05 / Notices & announcements</div>
+            <h2 className="section-heading">What’s happening at school.</h2>
+          </div>
+          {preview && (
+            <a className="text-link" href="/notices">
+              View all notices <ArrowRight size={16} />
+            </a>
+          )}
+        </div>
+        <div className="notice-list">
+          {notices.map((notice) => (
+            <article
+              className={`notice-card${notice.featured ? " featured" : ""}`}
+              key={notice.id}
+            >
+              <div className="notice-date">
+                <strong>{notice.date.split(" ")[0]}</strong>
+                <span>{notice.date.split(" ").slice(1).join(" ")}</span>
+              </div>
+              <div className="notice-copy">
+                <span className="notice-category">{notice.category}</span>
+                <h3>{notice.title}</h3>
+                <p>{notice.excerpt}</p>
+              </div>
+              <ArrowRight className="notice-arrow" size={18} />
+            </article>
+          ))}
+          {notices.length === 0 && (
+            <div className="empty-state">No notices published yet.</div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function GallerySection({ preview = false }: { preview?: boolean }) {
+  const { content } = useContent();
+  const gallery = preview ? content.gallery.slice(0, 5) : content.gallery;
+  return (
+    <section className="section-pad" id="gallery">
+      <div className="container-wide">
+        <div className="section-topline">
+          <div>
+            <div className="eyebrow">06 / Photo gallery</div>
+            <h2 className="section-heading">A visual story of school life.</h2>
+          </div>
+          {preview && (
+            <a className="text-link" href="/gallery">
+              Open gallery <ArrowRight size={16} />
+            </a>
+          )}
+        </div>
+        <div className="gallery-grid">
+          {gallery.map((item, index) => (
+            <div
+              className="gallery-placeholder"
+              key={item.id}
+              style={
+                item.image
+                  ? {
+                      backgroundImage: `linear-gradient(rgba(19,56,95,.08),rgba(19,56,95,.38)), url(${item.image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }
+                  : undefined
+              }
+            >
+              <div className="gallery-label">
+                <ImageIcon size={18} />
+                {item.title}
+                <small>{item.caption}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+        {!preview && (
+          <div className="gallery-foot">
+            <CircleAlert size={14} /> Upload approved images from the Admin
+            Dashboard to replace these content-ready panels.
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function AchievementsSection() {
+  const { content } = useContent();
+  return (
+    <section className="section-pad section-band">
+      <div className="container-wide">
+        <div className="eyebrow">07 / Achievements</div>
+        <h2 className="section-heading">
+          Every milestone is worth celebrating.
+        </h2>
+        <div className="achievement-grid">
+          {content.achievements.map((item) => (
+            <article className="achievement-card" key={item.id}>
+              <div className="achievement-year">{item.year}</div>
+              <Award size={22} />
+              <h3>{item.title}</h3>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function FacilitiesSection() {
+  const { content } = useContent();
+  return (
+    <section className="section-pad">
+      <div className="container-wide">
+        <div className="eyebrow">08 / Facilities</div>
+        <h2 className="section-heading">
+          The everyday spaces that support learning.
+        </h2>
+        <div className="facility-grid">
+          {content.facilities.map((item) => (
+            <article className="facility-card" key={item.id}>
+              <div className="facility-icon">
+                <Icon name={item.icon} />
+              </div>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 function AdmissionForm() {
-  const [values, setValues] = useState(initialForm);
-  const [errors, setErrors] = useState<Partial<Record<keyof FormValues, string>>>({});
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const update = (key: keyof FormValues, value: string) => {
-    setValues((current) => ({ ...current, [key]: value }));
-    setErrors((current) => ({ ...current, [key]: undefined }));
-    if (status !== 'idle') setStatus('idle');
-  };
-
-  const validate = () => {
-    const next: Partial<Record<keyof FormValues, string>> = {};
-    if (!values.guardian.trim()) next.guardian = 'Please enter a parent or guardian name.';
-    if (!values.student.trim()) next.student = 'Please enter the student’s name.';
-    if (!values.seekingClass.trim()) next.seekingClass = 'Please tell us the class you are considering.';
-    if (!/^[0-9+\s()-]{8,}$/.test(values.phone.trim())) next.phone = 'Please enter a valid phone number.';
-    if (values.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email)) next.email = 'Please enter a valid email address.';
-    setErrors(next);
-    return Object.keys(next).length === 0;
-  };
-
-  const submit = (event: FormEvent<HTMLFormElement>) => {
+  const { content, update } = useContent();
+  const [values, setValues] = useState({
+    guardian: "",
+    student: "",
+    currentClass: "",
+    seekingClass: "",
+    phone: "",
+    email: "",
+    message: "",
+  });
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [error, setError] = useState("");
+  const submit = (event: FormEvent) => {
     event.preventDefault();
-    if (!validate()) {
-      setStatus('error');
+    if (
+      !values.guardian ||
+      !values.student ||
+      !values.seekingClass ||
+      !/^[0-9+\s()-]{8,}$/.test(values.phone)
+    ) {
+      setError(
+        "Please complete the required fields with a valid phone number.",
+      );
+      setStatus("error");
       return;
     }
-    setStatus('loading');
-    window.setTimeout(() => setStatus('success'), 900);
+    const enquiry: Admission = {
+      ...values,
+      id: `enq-${Date.now()}`,
+      submittedAt: new Date().toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      }),
+      status: "New",
+    };
+    update("admissions", [enquiry, ...content.admissions]);
+    setValues({
+      guardian: "",
+      student: "",
+      currentClass: "",
+      seekingClass: "",
+      phone: "",
+      email: "",
+      message: "",
+    });
+    setError("");
+    setStatus("success");
   };
-
+  const field = (
+    id: keyof typeof values,
+    label: string,
+    required = false,
+    type = "text",
+  ) => (
+    <div className="field">
+      <label htmlFor={id}>
+        {label} {required && "*"}
+      </label>
+      <input
+        id={id}
+        type={type}
+        required={required}
+        value={values[id]}
+        onChange={(e) => {
+          setValues({ ...values, [id]: e.target.value });
+          setStatus("idle");
+        }}
+      />
+    </div>
+  );
   return (
-    <form className="form-card" onSubmit={submit} noValidate aria-label="Admission enquiry form">
-      {status === 'success' && <div className="form-status success" role="status" aria-live="polite" data-testid="status-enquiry-success"><Check size={15} style={{ verticalAlign: 'middle', marginRight: 7 }} aria-hidden="true" /> This preview enquiry has been recorded locally. It is not connected to the school yet.</div>}
-      {status === 'error' && Object.keys(errors).length > 0 && <div className="form-status error" role="alert" data-testid="status-enquiry-error"><CircleAlert size={15} style={{ verticalAlign: 'middle', marginRight: 7 }} aria-hidden="true" /> Please review the highlighted fields and try again.</div>}
+    <form className="form-card" onSubmit={submit} noValidate>
+      {status === "success" && (
+        <div className="form-status success">
+          <Check size={15} /> Enquiry received. The school office can now follow
+          up from the Admin Dashboard.
+        </div>
+      )}
+      {status === "error" && (
+        <div className="form-status error">
+          <CircleAlert size={15} /> {error}
+        </div>
+      )}
       <div className="form-grid">
-        <Field id="guardian" label="Parent / Guardian Name" value={values.guardian} error={errors.guardian} required onChange={(value) => update('guardian', value)} />
-        <Field id="student" label="Student Name" value={values.student} error={errors.student} required onChange={(value) => update('student', value)} />
-        <Field id="current-class" label="Student’s Current Class" value={values.currentClass} onChange={(value) => update('currentClass', value)} />
-        <Field id="seeking-class" label="Class Seeking Admission" value={values.seekingClass} error={errors.seekingClass} required onChange={(value) => update('seekingClass', value)} />
-        <Field id="phone" label="Phone Number" type="tel" value={values.phone} error={errors.phone} required onChange={(value) => update('phone', value)} />
-        <Field id="email" label="Email" type="email" value={values.email} error={errors.email} onChange={(value) => update('email', value)} />
-        <div className="field full"><label htmlFor="message">Message <span aria-hidden="true">(optional)</span></label><textarea id="message" value={values.message} onChange={(event) => update('message', event.target.value)} placeholder="Tell us what you would like to know." data-testid="input-message" /></div>
+        {field("guardian", "Parent / Guardian Name", true)}
+        {field("student", "Student Name", true)}
+        {field("currentClass", "Current Class")}
+        {field("seekingClass", "Class Seeking Admission", true)}
+        {field("phone", "Phone Number", true, "tel")}
+        {field("email", "Email", false, "email")}
+        <div className="field full">
+          <label htmlFor="message">Message</label>
+          <textarea
+            id="message"
+            value={values.message}
+            onChange={(e) => setValues({ ...values, message: e.target.value })}
+            placeholder="Tell us what you would like to know."
+          />
+        </div>
       </div>
-      <button className="button-primary" style={{ border: 0, cursor: status === 'loading' ? 'wait' : 'pointer', marginTop: 22 }} type="submit" disabled={status === 'loading'} data-testid="button-submit-enquiry">{status === 'loading' ? 'Preparing preview…' : 'Send Admission Enquiry'} <Send size={15} aria-hidden="true" /></button>
-      <p className="preview-note">Preview only — this form does not send data to Maa Gayatri Public School until an email, WhatsApp, backend API, Google Sheet or CRM connection is configured.</p>
+      <button
+        className="button-primary"
+        style={{ border: 0, cursor: "pointer", marginTop: 22 }}
+        type="submit"
+      >
+        Send Admission Enquiry <Send size={15} />
+      </button>
+      <p className="preview-note">
+        Your enquiry is saved securely in this browser for the school
+        administrator. Connect a backend or email service before production
+        launch.
+      </p>
     </form>
   );
 }
 
-function Field({ id, label, value, error, required, type = 'text', onChange }: { id: string; label: string; value: string; error?: string; required?: boolean; type?: string; onChange: (value: string) => void }) {
-  return <div className="field"><label htmlFor={id}>{label} {required && <span aria-hidden="true">*</span>}</label><input id={id} type={type} value={value} required={required} aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} onChange={(event) => onChange(event.target.value)} data-testid={`input-${id}`} />{error && <span className="field-error" id={`${id}-error`} role="alert">{error}</span>}</div>;
-}
-
-function Admissions() {
+function AdmissionsSection() {
+  const { content } = useContent();
   return (
-    <section className="admission-wrap section-pad" id="admissions" aria-labelledby="admission-title">
+    <section className="admission-wrap section-pad">
       <div className="container-wide admission-grid">
-        <div className="admission-aside"><div className="eyebrow eyebrow-light">06 / Admissions</div><h2 className="section-heading" id="admission-title">Give your child a strong start.</h2><p>Interested in Maa Gayatri Public School? Contact the school to learn about current admissions, available classes, requirements and important dates.</p><a className="button-quiet" href={school.whatsappHref} target="_blank" rel="noreferrer" data-testid="link-admission-whatsapp"><MessageCircle size={16} aria-hidden="true" /> Ask on WhatsApp</a></div>
+        <div className="admission-aside">
+          <div className="eyebrow eyebrow-light">
+            09 / Online admission enquiry
+          </div>
+          <h2 className="section-heading">Give your child a strong start.</h2>
+          <p>
+            Tell us a little about your child and the class you are considering.
+            The school office can review enquiries and update their status from
+            the dashboard.
+          </p>
+          <a
+            className="button-quiet"
+            href={whatsappHref(content.phone)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <MessageCircle size={16} /> Ask on WhatsApp
+          </a>
+        </div>
         <AdmissionForm />
       </div>
     </section>
   );
 }
 
-function Contact() {
+function ContactSection() {
+  const { content } = useContent();
   return (
-    <section className="contact-section section-pad" id="contact" aria-labelledby="contact-title">
+    <section className="contact-section section-pad" id="contact">
       <div className="container-wide contact-grid">
         <div>
-          <div className="eyebrow eyebrow-light">07 / Find us</div>
-          <h2 className="section-heading" id="contact-title">A conversation is the next step.</h2>
-          <p className="section-copy" style={{ marginTop: 24 }}>For the latest information about admissions, classes, curriculum, requirements and office timings, please contact the school directly.</p>
+          <div className="eyebrow eyebrow-light">10 / Contact & location</div>
+          <h2 className="section-heading">A conversation is the next step.</h2>
+          <p className="section-copy" style={{ marginTop: 24 }}>
+            Reach the school directly for the latest information about
+            admissions, classes, curriculum, requirements and office timings.
+          </p>
           <div className="contact-list">
-            <div className="contact-item"><MapPin size={19} aria-hidden="true" /><div><strong>Address</strong>{school.addressLines.map((line) => <span key={line}>{line}</span>)}</div></div>
-            <div className="contact-item"><Phone size={19} aria-hidden="true" /><div><strong>Phone</strong><a href={school.phoneHref} data-testid="link-contact-phone">{school.phoneDisplay}</a></div></div>
-            <div className="contact-item"><Mail size={19} aria-hidden="true" /><div><strong>Email</strong><a href={school.emailHref} data-testid="link-contact-email">{school.email}</a></div></div>
+            <div className="contact-item">
+              <MapPin size={19} />
+              <div>
+                <strong>Address</strong>
+                <span>{content.address}</span>
+              </div>
+            </div>
+            <div className="contact-item">
+              <Phone size={19} />
+              <div>
+                <strong>Phone</strong>
+                <a href={phoneHref(content.phone)}>{content.phone}</a>
+              </div>
+            </div>
+            <div className="contact-item">
+              <Mail size={19} />
+              <div>
+                <strong>Email</strong>
+                <a href={`mailto:${content.email}`}>{content.email}</a>
+              </div>
+            </div>
           </div>
-          <div className="contact-actions"><a className="button-primary" href={school.phoneHref} data-testid="link-contact-call"><Phone size={15} aria-hidden="true" /> Call Now</a><a className="button-quiet" href={school.whatsappHref} target="_blank" rel="noreferrer" data-testid="link-contact-whatsapp"><MessageCircle size={15} aria-hidden="true" /> WhatsApp</a><a className="button-quiet" href={school.directionsHref} target="_blank" rel="noreferrer" data-testid="link-contact-directions"><Compass size={15} aria-hidden="true" /> Get Directions</a></div>
+          <div className="contact-actions">
+            <a className="button-primary" href={phoneHref(content.phone)}>
+              <Phone size={15} /> Call Now
+            </a>
+            <a
+              className="button-quiet"
+              href={whatsappHref(content.phone)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <MessageCircle size={15} /> WhatsApp
+            </a>
+            <a
+              className="button-quiet"
+              href={mapHref(content.address)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Compass size={15} /> Get Directions
+            </a>
+          </div>
         </div>
-        <aside className="contact-card"><h3>Plan your visit</h3><p>School Office Hours — Please contact the school for current timings. Public listings currently contain inconsistent opening-hour information.</p><div className="map-placeholder"><MapPin size={24} aria-hidden="true" /><p>Map embed intentionally omitted until the correct school location can be verified. Use the directions link to open a location search.</p><a className="button-quiet" href={school.directionsHref} target="_blank" rel="noreferrer" data-testid="link-map-directions">Open directions <ChevronRight size={15} aria-hidden="true" /></a></div></aside>
+        <aside className="contact-card">
+          <h3>Plan your visit</h3>
+          <p>{content.officeHours}</p>
+          <div className="map-placeholder">
+            <MapPin size={24} />
+            <p>
+              Open the school location in Google Maps for directions from your
+              current location.
+            </p>
+            <a
+              className="button-quiet"
+              href={mapHref(content.address)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open directions <ChevronRight size={15} />
+            </a>
+          </div>
+        </aside>
       </div>
     </section>
   );
 }
 
 function Footer() {
+  const { content } = useContent();
   return (
     <footer className="footer">
       <div className="container-wide">
         <div className="footer-grid">
-          <div><Brand /><p>{school.name} is an English-medium co-educational school in Muzaffarpur, Bihar. A temporary text identity is used until an official logo is supplied.</p></div>
-          <div><h3>Explore</h3><div className="footer-links">{navItems.map((item) => <a href={item.href} key={item.href} data-testid={`link-footer-${item.label.toLowerCase()}`}>{item.label}</a>)}</div></div>
-          <div className="footer-contact"><h3>Contact</h3><a href={school.phoneHref} data-testid="link-footer-phone">{school.phoneDisplay}</a><a href={school.emailHref} data-testid="link-footer-email">{school.email}</a><span>{school.addressLines.map((line) => <span key={line}>{line}<br /></span>)}</span></div>
+          <div>
+            <Brand />
+            <p>
+              {content.schoolName} is an English-medium co-educational school in
+              Muzaffarpur, Bihar. Helping every learner begin well.
+            </p>
+          </div>
+          <div>
+            <h3>Explore</h3>
+            <div className="footer-links">
+              {publicNav.slice(0, 6).map(([label, href]) => (
+                <a href={href} key={href}>
+                  {label}
+                </a>
+              ))}
+            </div>
+          </div>
+          <div className="footer-contact">
+            <h3>Contact</h3>
+            <a href={phoneHref(content.phone)}>{content.phone}</a>
+            <a href={`mailto:${content.email}`}>{content.email}</a>
+            <span>{content.address}</span>
+            <a className="admin-footer-link" href="/admin">
+              <LayoutDashboard size={14} /> Admin Dashboard
+            </a>
+          </div>
         </div>
-        <div className="footer-bottom"><span data-testid="text-copyright">© 2026 {school.name}. All Rights Reserved.</span><span>{school.developer ? `Website designed and developed by ${school.developer}` : 'Website content and developer details can be configured here.'}</span></div>
+        <div className="footer-bottom">
+          <span>© 2026 {content.schoolName}. All Rights Reserved.</span>
+          <span>Content can be updated by the school administrator.</span>
+        </div>
       </div>
     </footer>
   );
 }
-
 function MobileCta() {
-  return <div className="mobile-cta" aria-label="Quick contact"><a href={school.phoneHref} data-testid="link-mobile-call"><Phone aria-hidden="true" />Call</a><a href={school.whatsappHref} target="_blank" rel="noreferrer" data-testid="link-mobile-whatsapp"><MessageCircle aria-hidden="true" />WhatsApp</a><a href={school.directionsHref} target="_blank" rel="noreferrer" data-testid="link-mobile-directions"><Compass aria-hidden="true" />Directions</a></div>;
-}
-
-function PageHeader({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  const { content } = useContent();
   return (
-    <section className="page-hero" aria-labelledby="page-title">
-      <div className="container-wide">
-        <div className="eyebrow eyebrow-light">{eyebrow}</div>
-        <h1 id="page-title" className="section-heading">{title}</h1>
-        <p>{copy}</p>
-      </div>
-    </section>
+    <div className="mobile-cta">
+      <a href={phoneHref(content.phone)}>
+        <Phone />
+        Call
+      </a>
+      <a href={whatsappHref(content.phone)} target="_blank" rel="noreferrer">
+        <MessageCircle />
+        WhatsApp
+      </a>
+      <a href={mapHref(content.address)} target="_blank" rel="noreferrer">
+        <Compass />
+        Directions
+      </a>
+    </div>
   );
 }
-
-function HomeWelcome() {
+function Shell({ children }: { children: ReactNode }) {
   return (
-    <section className="section-pad section-band home-welcome" aria-labelledby="welcome-title">
-      <div className="container-wide home-welcome-grid">
-        <div>
-          <div className="eyebrow">01 / Start here</div>
-          <h2 className="section-heading" id="welcome-title">A steady place to begin well.</h2>
-          <div className="gold-rule" style={{ marginTop: 26 }} />
-          <p className="section-copy" style={{ marginTop: 24 }}>
-            Maa Gayatri Public School is an English-medium co-educational school in Muzaffarpur, focused on academic growth, confidence, discipline and character.
-          </p>
-          <a className="button-primary" style={{ marginTop: 26 }} href="/about" data-testid="link-home-about">About the school <ChevronRight size={16} aria-hidden="true" /></a>
-        </div>
-        <div className="home-welcome-card">
-          <div className="home-welcome-card-label">A parent’s first look</div>
-          <h3>Everything you need to take the next step.</h3>
-          <div className="home-welcome-links">
-            <a href="/academics">Explore academics <ChevronRight size={15} aria-hidden="true" /></a>
-            <a href="/gallery">See the learning environment <ChevronRight size={15} aria-hidden="true" /></a>
-            <a href="/contact">Contact the school <ChevronRight size={15} aria-hidden="true" /></a>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function HomeNextStep() {
-  return (
-    <section className="section-pad home-next-step" aria-labelledby="next-step-title">
-      <div className="container-wide home-next-step-grid">
-        <div>
-          <div className="eyebrow">02 / Your next step</div>
-          <h2 className="section-heading" id="next-step-title">Have a question? Start a conversation.</h2>
-        </div>
-        <div>
-          <p className="section-copy">For current admissions, classes, curriculum, requirements and office timings, please contact the school directly.</p>
-          <div className="contact-actions">
-            <a className="button-primary" href="/admissions">Admission Enquiry <ChevronRight size={16} aria-hidden="true" /></a>
-            <a className="text-link" href="/contact">Call or message the school <ChevronRight size={16} aria-hidden="true" /></a>
-          </div>
-        </div>
-      </div>
-    </section>
+    <div className="site-shell">
+      <Header />
+      <main>{children}</main>
+      <Footer />
+      <MobileCta />
+    </div>
   );
 }
 
 function Home() {
-  return <div className="site-shell"><Header /><main><Hero /><TrustStrip /><HomeWelcome /><HomeNextStep /></main><Footer /><MobileCta /></div>;
+  return (
+    <Shell>
+      <Hero />
+      <TrustStrip />
+      <AboutSection />
+      <NoticesSection preview />
+      <AcademicsSection />
+      <FacultySection />
+      <GallerySection preview />
+      <AchievementsSection />
+      <FacilitiesSection />
+      <AdmissionsSection />
+      <ContactSection />
+    </Shell>
+  );
 }
-
 function AboutPage() {
-  return <div className="site-shell"><Header /><main><PageHeader eyebrow="01 / The school" title="A school journey built on steady foundations." copy="Get to know Maa Gayatri Public School, its setting in Muzaffarpur and the values that shape this digital front door." /><About /><Beliefs /><WhyChoose /></main><Footer /><MobileCta /></div>;
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="01 / About us"
+        title="A school journey built on steady foundations."
+        copy="Get to know Maa Gayatri Public School, its setting in Muzaffarpur and the values that shape school life."
+      />
+      <AboutSection />
+      <Beliefs />
+    </Shell>
+  );
 }
-
 function AcademicsPage() {
-  return <div className="site-shell"><Header /><main><PageHeader eyebrow="02 / Academics" title="Foundations for a curious mind." copy="Explore the learning focus, student development priorities and secondary-level education described in currently available public information." /><Academics /></main><Footer /><MobileCta /></div>;
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="02 / Academics & classes"
+        title="Foundations for a curious mind."
+        copy="Explore the learning focus and class journey for students at Maa Gayatri Public School."
+      />
+      <AcademicsSection />
+    </Shell>
+  );
 }
-
+function FacultyPage() {
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="03 / Faculty & staff"
+        title="People who make school feel personal."
+        copy="Meet the teams who guide, teach and care for students each day."
+      />
+      <FacultySection />
+    </Shell>
+  );
+}
 function AdmissionsPage() {
-  return <div className="site-shell"><Header /><main><PageHeader eyebrow="03 / Admissions" title="Give your child a strong start." copy="Contact the school to learn about current admissions, available classes, requirements and important dates." /><Admissions /></main><Footer /><MobileCta /></div>;
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="04 / Admissions"
+        title="Give your child a strong start."
+        copy="Submit an online admission enquiry and the school office will follow up with the latest information."
+      />
+      <AdmissionsSection />
+    </Shell>
+  );
 }
-
+function NoticesPage() {
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="05 / Notices"
+        title="The latest from school."
+        copy="Keep up with admissions, events, circulars and important announcements."
+      />
+      <NoticesSection />
+    </Shell>
+  );
+}
 function GalleryPage() {
-  return <div className="site-shell"><Header /><main><PageHeader eyebrow="04 / The environment" title="A visual story, ready to be filled." copy="Approved campus, classroom and activity photography can make this space truly yours. Until then, every panel is clearly marked for replacement." /><Gallery /></main><Footer /><MobileCta /></div>;
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="06 / Photo gallery"
+        title="A visual story of school life."
+        copy="Browse the school’s campus, classroom, activity and celebration moments."
+      />
+      <GallerySection />
+    </Shell>
+  );
+}
+function AchievementsPage() {
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="07 / Achievements"
+        title="Every milestone is worth celebrating."
+        copy="A collection of the moments and values the school community is proud of."
+      />
+      <AchievementsSection />
+    </Shell>
+  );
+}
+function FacilitiesPage() {
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="08 / Facilities"
+        title="The everyday spaces that support learning."
+        copy="Explore the spaces and resources that help students learn, participate and grow."
+      />
+      <FacilitiesSection />
+    </Shell>
+  );
+}
+function ContactPage() {
+  return (
+    <Shell>
+      <PageHeader
+        eyebrow="10 / Contact & location"
+        title="A conversation is the next step."
+        copy="Reach the school directly for the latest information and directions."
+      />
+      <ContactSection />
+    </Shell>
+  );
 }
 
-function ContactPage() {
-  return <div className="site-shell"><Header /><main><PageHeader eyebrow="05 / Find us" title="A conversation is the next step." copy="Reach Maa Gayatri Public School directly for the latest information about admissions, classes, curriculum, requirements and office timings." /><Contact /></main><Footer /><MobileCta /></div>;
+type Tab =
+  "overview" | "content" | "notices" | "gallery" | "admissions" | "people";
+function AdminSidebar({
+  tab,
+  setTab,
+}: {
+  tab: Tab;
+  setTab: (tab: Tab) => void;
+}) {
+  const items: [Tab, string, typeof LayoutDashboard][] = [
+    ["overview", "Overview", LayoutDashboard],
+    ["content", "Website content", Settings],
+    ["notices", "Notices", FileText],
+    ["gallery", "Photo gallery", ImageIcon],
+    ["admissions", "Admissions", GraduationCap],
+    ["people", "Faculty & school", Users],
+  ];
+  return (
+    <aside className="admin-sidebar">
+      <a className="admin-brand" href="/">
+        <span className="brand-seal">MGPS</span>
+        <span>
+          <strong>School CMS</strong>
+          <small>{"Maa Gayatri Public School"}</small>
+        </span>
+      </a>
+      <div className="admin-side-label">Manage website</div>
+      <nav>
+        {items.map(([id, label, IconComponent]) => (
+          <button
+            className={tab === id ? "active" : ""}
+            onClick={() => setTab(id)}
+            key={id}
+          >
+            <IconComponent size={17} />
+            {label}
+          </button>
+        ))}
+      </nav>
+      <a className="admin-view-site" href="/">
+        <ArrowRight size={15} /> View live website
+      </a>
+    </aside>
+  );
+}
+function AdminField({
+  label,
+  value,
+  onChange,
+  area = false,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  area?: boolean;
+}) {
+  return (
+    <label className="admin-field">
+      <span>{label}</span>
+      {area ? (
+        <textarea value={value} onChange={(e) => onChange(e.target.value)} />
+      ) : (
+        <input value={value} onChange={(e) => onChange(e.target.value)} />
+      )}
+    </label>
+  );
+}
+function AdminOverview({ setTab }: { setTab: (tab: Tab) => void }) {
+  const { content } = useContent();
+  const cards: [string, string, Tab, typeof FileText][] = [
+    ["Published notices", String(content.notices.length), "notices", FileText],
+    ["Gallery panels", String(content.gallery.length), "gallery", ImageIcon],
+    [
+      "New enquiries",
+      String(content.admissions.filter((item) => item.status === "New").length),
+      "admissions",
+      GraduationCap,
+    ],
+    ["Faculty & staff", String(content.faculty.length), "people", Users],
+  ];
+  return (
+    <>
+      <div className="admin-heading">
+        <div>
+          <div className="eyebrow">Admin workspace</div>
+          <h1>Good morning, school team.</h1>
+          <p>Keep your public website fresh from one simple place.</p>
+        </div>
+        <a className="button-primary" href="/">
+          <ArrowRight size={16} /> View website
+        </a>
+      </div>
+      <div className="admin-stat-grid">
+        {cards.map(([label, value, tab, IconComponent]) => (
+          <button
+            className="admin-stat"
+            key={label}
+            onClick={() => setTab(tab)}
+          >
+            <IconComponent size={19} />
+            <strong>{value}</strong>
+            <span>{label}</span>
+            <ArrowRight size={15} />
+          </button>
+        ))}
+      </div>
+      <div className="admin-two-col">
+        <div className="admin-panel">
+          <div className="admin-panel-title">
+            <div>
+              <span>Quick actions</span>
+              <h2>What would you like to update?</h2>
+            </div>
+            <Pencil size={19} />
+          </div>
+          <div className="quick-admin-actions">
+            <button onClick={() => setTab("notices")}>
+              <Plus size={16} /> Publish notice
+            </button>
+            <button onClick={() => setTab("gallery")}>
+              <ImageIcon size={16} /> Add gallery image
+            </button>
+            <button onClick={() => setTab("admissions")}>
+              <GraduationCap size={16} /> Review enquiries
+            </button>
+            <button onClick={() => setTab("content")}>
+              <Settings size={16} /> Edit school details
+            </button>
+          </div>
+        </div>
+        <div className="admin-panel admin-tip">
+          <Sparkles size={21} />
+          <div>
+            <span>Simple editing</span>
+            <h2>Changes save automatically</h2>
+            <p>
+              Updates are stored in this browser and appear immediately on the
+              public pages. Connect a database before publishing to multiple
+              devices.
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AdminContent() {
+  const { content, update } = useContent();
+  const set = (key: keyof SiteContent) => (value: string) =>
+    update(key, value as never);
+  return (
+    <>
+      <div className="admin-panel">
+        <div className="admin-panel-title">
+          <div>
+            <span>Website content</span>
+            <h2>School identity & contact details</h2>
+          </div>
+          <Save size={19} />
+        </div>
+        <p className="admin-help">
+          Update the text parents see across the home page, header and contact
+          page.
+        </p>
+        <div className="admin-form-grid">
+          <AdminField
+            label="School name"
+            value={content.schoolName}
+            onChange={set("schoolName")}
+          />
+          <AdminField
+            label="Short name"
+            value={content.shortName}
+            onChange={set("shortName")}
+          />
+          <AdminField
+            label="Top announcement"
+            value={content.tagline}
+            onChange={set("tagline")}
+          />
+          <AdminField
+            label="Hero headline"
+            value={content.heroTitle}
+            onChange={set("heroTitle")}
+          />
+          <AdminField
+            label="Phone number"
+            value={content.phone}
+            onChange={set("phone")}
+          />
+          <AdminField
+            label="Email address"
+            value={content.email}
+            onChange={set("email")}
+          />
+          <AdminField
+            label="Office hours"
+            value={content.officeHours}
+            onChange={set("officeHours")}
+          />
+          <AdminField
+            label="Hero introduction"
+            value={content.heroCopy}
+            onChange={set("heroCopy")}
+            area
+          />
+          <AdminField
+            label="About the school"
+            value={content.aboutCopy}
+            onChange={set("aboutCopy")}
+            area
+          />
+          <AdminField
+            label="Full address"
+            value={content.address}
+            onChange={set("address")}
+            area
+          />
+        </div>
+      </div>
+      <AdminPageCollections />
+    </>
+  );
+}
+
+function AdminPageCollections() {
+  const { content, update } = useContent();
+  const addAchievement = () =>
+    update("achievements", [
+      ...content.achievements,
+      {
+        id: `a-${Date.now()}`,
+        title: "New achievement",
+        detail: "Add the achievement details.",
+        year: "2026",
+      },
+    ]);
+  const addFacility = () =>
+    update("facilities", [
+      ...content.facilities,
+      {
+        id: `fac-${Date.now()}`,
+        title: "New facility",
+        description: "Add a short description.",
+        icon: "sparkles",
+      },
+    ]);
+  return (
+    <div className="admin-collections">
+      <div className="admin-panel">
+        <AdminPanelHead
+          eyebrow="Achievements"
+          title="Celebrate school milestones."
+          action={addAchievement}
+          actionLabel="Add achievement"
+        />
+        <div className="admin-edit-list">
+          {content.achievements.map((item) => (
+            <div className="admin-edit-card" key={item.id}>
+              <div className="admin-form-grid compact">
+                <AdminField
+                  label="Year"
+                  value={item.year}
+                  onChange={(value) =>
+                    update(
+                      "achievements",
+                      content.achievements.map((entry) =>
+                        entry.id === item.id
+                          ? { ...entry, year: value }
+                          : entry,
+                      ),
+                    )
+                  }
+                />
+                <AdminField
+                  label="Title"
+                  value={item.title}
+                  onChange={(value) =>
+                    update(
+                      "achievements",
+                      content.achievements.map((entry) =>
+                        entry.id === item.id
+                          ? { ...entry, title: value }
+                          : entry,
+                      ),
+                    )
+                  }
+                />
+              </div>
+              <AdminField
+                label="Details"
+                value={item.detail}
+                onChange={(value) =>
+                  update(
+                    "achievements",
+                    content.achievements.map((entry) =>
+                      entry.id === item.id
+                        ? { ...entry, detail: value }
+                        : entry,
+                    ),
+                  )
+                }
+                area
+              />
+              <button
+                className="icon-button danger standalone"
+                aria-label="Delete achievement"
+                onClick={() =>
+                  update(
+                    "achievements",
+                    content.achievements.filter(
+                      (entry) => entry.id !== item.id,
+                    ),
+                  )
+                }
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="admin-panel">
+        <AdminPanelHead
+          eyebrow="Facilities"
+          title="Describe the learning spaces."
+          action={addFacility}
+          actionLabel="Add facility"
+        />
+        <div className="admin-edit-list">
+          {content.facilities.map((item) => (
+            <div className="admin-edit-card" key={item.id}>
+              <div className="admin-form-grid compact">
+                <AdminField
+                  label="Title"
+                  value={item.title}
+                  onChange={(value) =>
+                    update(
+                      "facilities",
+                      content.facilities.map((entry) =>
+                        entry.id === item.id
+                          ? { ...entry, title: value }
+                          : entry,
+                      ),
+                    )
+                  }
+                />
+                <AdminField
+                  label="Icon (book, map, shield…)"
+                  value={item.icon}
+                  onChange={(value) =>
+                    update(
+                      "facilities",
+                      content.facilities.map((entry) =>
+                        entry.id === item.id
+                          ? { ...entry, icon: value }
+                          : entry,
+                      ),
+                    )
+                  }
+                />
+              </div>
+              <AdminField
+                label="Description"
+                value={item.description}
+                onChange={(value) =>
+                  update(
+                    "facilities",
+                    content.facilities.map((entry) =>
+                      entry.id === item.id
+                        ? { ...entry, description: value }
+                        : entry,
+                    ),
+                  )
+                }
+                area
+              />
+              <button
+                className="icon-button danger standalone"
+                aria-label="Delete facility"
+                onClick={() =>
+                  update(
+                    "facilities",
+                    content.facilities.filter((entry) => entry.id !== item.id),
+                  )
+                }
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function AdminNotices() {
+  const { content, update } = useContent();
+  const add = () =>
+    update("notices", [
+      {
+        id: `n-${Date.now()}`,
+        title: "New school notice",
+        date: "29 Aug 2026",
+        category: "General",
+        excerpt: "Add the details for this announcement.",
+        featured: false,
+      },
+      ...content.notices,
+    ]);
+  const edit = (id: string, key: keyof Notice, value: string | boolean) =>
+    update(
+      "notices",
+      content.notices.map((item) =>
+        item.id === id ? { ...item, [key]: value } : item,
+      ),
+    );
+  return (
+    <div className="admin-panel">
+      <AdminPanelHead
+        eyebrow="Notices & announcements"
+        title="Publish clear updates for families."
+        action={add}
+        actionLabel="Add notice"
+      />
+      <div className="admin-edit-list">
+        {content.notices.map((item) => (
+          <div className="admin-edit-card" key={item.id}>
+            <div className="admin-edit-card-top">
+              <span className="notice-category">{item.category}</span>
+              <button
+                className="icon-button danger"
+                aria-label="Delete notice"
+                onClick={() =>
+                  update(
+                    "notices",
+                    content.notices.filter((notice) => notice.id !== item.id),
+                  )
+                }
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+            <AdminField
+              label="Title"
+              value={item.title}
+              onChange={(value) => edit(item.id, "title", value)}
+            />
+            <div className="admin-form-grid compact">
+              <AdminField
+                label="Date"
+                value={item.date}
+                onChange={(value) => edit(item.id, "date", value)}
+              />
+              <AdminField
+                label="Category"
+                value={item.category}
+                onChange={(value) => edit(item.id, "category", value)}
+              />
+            </div>
+            <AdminField
+              label="Short description"
+              value={item.excerpt}
+              onChange={(value) => edit(item.id, "excerpt", value)}
+              area
+            />
+            <label className="check-field">
+              <input
+                type="checkbox"
+                checked={Boolean(item.featured)}
+                onChange={(e) => edit(item.id, "featured", e.target.checked)}
+              />{" "}
+              Feature this notice on the homepage
+            </label>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminGallery() {
+  const { content, update } = useContent();
+  const add = () =>
+    update("gallery", [
+      ...content.gallery,
+      {
+        id: `g-${Date.now()}`,
+        title: "New gallery item",
+        caption: "Add a caption",
+        image: "",
+      },
+    ]);
+  const edit = (id: string, key: keyof GalleryItem, value: string) =>
+    update(
+      "gallery",
+      content.gallery.map((item) =>
+        item.id === id ? { ...item, [key]: value } : item,
+      ),
+    );
+  return (
+    <div className="admin-panel">
+      <AdminPanelHead
+        eyebrow="Photo gallery"
+        title="Add approved school photographs."
+        action={add}
+        actionLabel="Add image"
+      />
+      <p className="admin-help">
+        Paste a hosted image URL below. For a production version, connect this
+        to your media storage provider.
+      </p>
+      <div className="admin-edit-list gallery-admin-list">
+        {content.gallery.map((item) => (
+          <div className="admin-edit-card gallery-admin-card" key={item.id}>
+            {item.image ? (
+              <img src={item.image} alt="" />
+            ) : (
+              <div className="gallery-admin-preview">
+                <ImageIcon size={24} />
+                <span>Image preview</span>
+              </div>
+            )}
+            <div className="gallery-admin-fields">
+              <div className="admin-edit-card-top">
+                <span className="notice-category">Gallery item</span>
+                <button
+                  className="icon-button danger"
+                  aria-label="Delete gallery item"
+                  onClick={() =>
+                    update(
+                      "gallery",
+                      content.gallery.filter(
+                        (gallery) => gallery.id !== item.id,
+                      ),
+                    )
+                  }
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+              <AdminField
+                label="Image URL"
+                value={item.image || ""}
+                onChange={(value) => edit(item.id, "image", value)}
+              />
+              <AdminField
+                label="Title"
+                value={item.title}
+                onChange={(value) => edit(item.id, "title", value)}
+              />
+              <AdminField
+                label="Caption"
+                value={item.caption}
+                onChange={(value) => edit(item.id, "caption", value)}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AdminAdmissions() {
+  const { content, update } = useContent();
+  const setStatus = (id: string, status: Admission["status"]) =>
+    update(
+      "admissions",
+      content.admissions.map((item) =>
+        item.id === id ? { ...item, status } : item,
+      ),
+    );
+  return (
+    <div className="admin-panel">
+      <AdminPanelHead
+        eyebrow="Online admission enquiry"
+        title="Review parent enquiries."
+      />
+      <div className="admin-table-wrap">
+        {content.admissions.length === 0 ? (
+          <div className="empty-state">
+            No admission enquiries yet. New submissions from the public form
+            will appear here.
+          </div>
+        ) : (
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th>Student / guardian</th>
+                <th>Class</th>
+                <th>Contact</th>
+                <th>Received</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {content.admissions.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <strong>{item.student}</strong>
+                    <span>{item.guardian}</span>
+                    {item.message && <small>{item.message}</small>}
+                  </td>
+                  <td>
+                    {item.seekingClass}
+                    <span>From {item.currentClass || "—"}</span>
+                  </td>
+                  <td>
+                    <a href={phoneHref(item.phone)}>{item.phone}</a>
+                    <span>{item.email || "No email"}</span>
+                  </td>
+                  <td>{item.submittedAt}</td>
+                  <td>
+                    <select
+                      value={item.status}
+                      onChange={(e) =>
+                        setStatus(
+                          item.id,
+                          e.target.value as Admission["status"],
+                        )
+                      }
+                    >
+                      <option>New</option>
+                      <option>Contacted</option>
+                      <option>Closed</option>
+                    </select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AdminPeople() {
+  const { content, update } = useContent();
+  const add = () =>
+    update("faculty", [
+      ...content.faculty,
+      {
+        id: `f-${Date.now()}`,
+        name: "New team member",
+        role: "Role or responsibility",
+        subject: "Area of work",
+        initials: "NM",
+      },
+    ]);
+  const edit = (
+    id: string,
+    key: "name" | "role" | "subject" | "initials",
+    value: string,
+  ) =>
+    update(
+      "faculty",
+      content.faculty.map((item) =>
+        item.id === id ? { ...item, [key]: value } : item,
+      ),
+    );
+  return (
+    <div className="admin-panel">
+      <AdminPanelHead
+        eyebrow="Faculty & school content"
+        title="Keep people and trust content current."
+        action={add}
+        actionLabel="Add team member"
+      />
+      <div className="admin-edit-list">
+        {content.faculty.map((item) => (
+          <div className="admin-edit-card" key={item.id}>
+            <div className="person-avatar small">{item.initials}</div>
+            <div className="admin-form-grid compact">
+              <AdminField
+                label="Name"
+                value={item.name}
+                onChange={(value) => edit(item.id, "name", value)}
+              />
+              <AdminField
+                label="Initials"
+                value={item.initials}
+                onChange={(value) => edit(item.id, "initials", value)}
+              />
+              <AdminField
+                label="Role"
+                value={item.role}
+                onChange={(value) => edit(item.id, "role", value)}
+              />
+              <AdminField
+                label="Subject / area"
+                value={item.subject}
+                onChange={(value) => edit(item.id, "subject", value)}
+              />
+            </div>
+            <button
+              className="icon-button danger standalone"
+              aria-label="Delete team member"
+              onClick={() =>
+                update(
+                  "faculty",
+                  content.faculty.filter((person) => person.id !== item.id),
+                )
+              }
+            >
+              <Trash2 size={16} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+function AdminPanelHead({
+  eyebrow,
+  title,
+  action,
+  actionLabel,
+}: {
+  eyebrow: string;
+  title: string;
+  action?: () => void;
+  actionLabel?: string;
+}) {
+  return (
+    <div className="admin-panel-title">
+      <div>
+        <span>{eyebrow}</span>
+        <h2>{title}</h2>
+      </div>
+      {action && (
+        <button className="button-primary small-button" onClick={action}>
+          <Plus size={15} /> {actionLabel}
+        </button>
+      )}
+    </div>
+  );
+}
+function AdminDashboard() {
+  const [tab, setTab] = useState<Tab>("overview");
+  const { reset, connected } = useContent();
+  const titles: Record<Tab, string> = {
+    overview: "Overview",
+    content: "Website content",
+    notices: "Notices",
+    gallery: "Photo gallery",
+    admissions: "Admissions",
+    people: "Faculty & school",
+  };
+  return (
+    <div className="admin-shell">
+      <AdminSidebar tab={tab} setTab={setTab} />
+      <main className="admin-main">
+        <div className="admin-mobile-top">
+          <a href="/">
+            <span className="brand-seal">MGPS</span>
+          </a>
+          <span>School CMS</span>
+          <a href="/">
+            <X size={18} />
+          </a>
+        </div>
+        <div className="admin-breadcrumb">
+          <span>Dashboard</span>
+          <ChevronRight size={14} />
+          <strong>{titles[tab]}</strong>
+        </div>
+        {tab === "overview" && <AdminOverview setTab={setTab} />}
+        {tab === "content" && <AdminContent />}
+        {tab === "notices" && <AdminNotices />}
+        {tab === "gallery" && <AdminGallery />}
+        {tab === "admissions" && <AdminAdmissions />}
+        {tab === "people" && <AdminPeople />}
+        <div className="admin-footer-actions">
+          <button
+            className="reset-link"
+            onClick={() => {
+              if (window.confirm("Restore all original sample content?"))
+                reset();
+            }}
+          >
+            Restore sample content
+          </button>
+          <span>{connected ? "Database connected · changes save automatically" : "API unavailable · reconnect the database to save changes"}</span>
+        </div>
+      </main>
+    </div>
+  );
 }
 
 function NotFound() {
   const [, setLocation] = useLocation();
-  return <div className="not-found"><div><div className="eyebrow">Page not found</div><h1 className="section-heading">Let’s return to the school.</h1><button className="button-primary" style={{ border: 0, cursor: 'pointer', marginTop: 28 }} type="button" onClick={() => { setLocation('/'); window.setTimeout(scrollToTop, 20); }} data-testid="button-not-found-home">Back to home <ChevronRight size={16} aria-hidden="true" /></button></div></div>;
+  return (
+    <div className="not-found">
+      <div>
+        <div className="eyebrow">Page not found</div>
+        <h1 className="section-heading">Let’s return to the school.</h1>
+        <button
+          className="button-primary"
+          style={{ border: 0, cursor: "pointer", marginTop: 28 }}
+          onClick={() => {
+            setLocation("/");
+            setTimeout(scrollToTop, 20);
+          }}
+        >
+          Back to home <ChevronRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
 }
-
 function Router() {
-  return <ErrorBoundary><Switch><Route path="/" component={Home} /><Route path="/about" component={AboutPage} /><Route path="/academics" component={AcademicsPage} /><Route path="/admissions" component={AdmissionsPage} /><Route path="/gallery" component={GalleryPage} /><Route path="/contact" component={ContactPage} /><Route component={NotFound} /></Switch></ErrorBoundary>;
+  return (
+    <ErrorBoundary>
+      <Switch>
+        <Route path="/" component={Home} />
+        <Route path="/about" component={AboutPage} />
+        <Route path="/academics" component={AcademicsPage} />
+        <Route path="/faculty" component={FacultyPage} />
+        <Route path="/admissions" component={AdmissionsPage} />
+        <Route path="/notices" component={NoticesPage} />
+        <Route path="/gallery" component={GalleryPage} />
+        <Route path="/achievements" component={AchievementsPage} />
+        <Route path="/facilities" component={FacilitiesPage} />
+        <Route path="/contact" component={ContactPage} />
+        <Route path="/admin" component={AdminDashboard} />
+        <Route component={NotFound} />
+      </Switch>
+    </ErrorBoundary>
+  );
 }
-
 function App() {
-  return <QueryClientProvider client={queryClient}><TooltipProvider><WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}><Router /></WouterRouter><Toaster /></TooltipProvider></QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ContentProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <Toaster />
+        </ContentProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
 }
-
 export default App;

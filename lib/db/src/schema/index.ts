@@ -1,20 +1,28 @@
-// Export your models here. Add one export per file
-// export * from "./posts";
-//
-// Each model/table should ideally be split into different files.
-// Each model/table should define a Drizzle table, insert schema, and types:
-//
-//   import { pgTable, text, serial } from "drizzle-orm/pg-core";
-//   import { createInsertSchema } from "drizzle-zod";
-//   import { z } from "zod/v4";
-//
-//   export const postsTable = pgTable("posts", {
-//     id: serial("id").primaryKey(),
-//     title: text("title").notNull(),
-//   });
-//
-//   export const insertPostSchema = createInsertSchema(postsTable).omit({ id: true });
-//   export type InsertPost = z.infer<typeof insertPostSchema>;
-//   export type Post = typeof postsTable.$inferSelect;
+import { integer, jsonb, pgTable, timestamp } from "drizzle-orm/pg-core";
 
-export {}
+export type SiteContentData = {
+  schoolName: string;
+  shortName: string;
+  tagline: string;
+  heroTitle: string;
+  heroCopy: string;
+  aboutCopy: string;
+  phone: string;
+  email: string;
+  address: string;
+  officeHours: string;
+  notices: unknown[];
+  gallery: unknown[];
+  faculty: unknown[];
+  achievements: unknown[];
+  facilities: unknown[];
+  admissions: unknown[];
+};
+
+export const siteContentTable = pgTable("site_content", {
+  id: integer("id").primaryKey(),
+  data: jsonb("data").$type<SiteContentData>().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
+});
+
+export type SiteContentRow = typeof siteContentTable.$inferSelect;
