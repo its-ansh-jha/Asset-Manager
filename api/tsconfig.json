@@ -1,14 +1,15 @@
 {
-  "extends": "../tsconfig.base.json",
   "compilerOptions": {
     "noEmit": false,
     "noEmitOnError": false,
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "target": "ES2022",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true,
     "types": ["node"],
     "outDir": "../.vercel/output/functions/api"
   },
-  "include": ["./index.ts", "../artifacts/api-server/src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["./index.ts"]
 }
