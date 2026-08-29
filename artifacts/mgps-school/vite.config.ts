@@ -1,7 +1,8 @@
 import path from 'path';
+import { cp, mkdir } from 'node:fs/promises';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-import { defineConfig } from 'vite';
+import { defineConfig, type Plugin } from 'vite';
 
 import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 
@@ -15,11 +16,22 @@ if (Number.isNaN(port) || port <= 0) {
 
 const basePath = process.env.BASE_PATH ?? '/';
 
+const copyRepositoryOutput = (): Plugin => ({
+  name: 'copy-repository-output',
+  async closeBundle() {
+    const appOutput = path.resolve(import.meta.dirname, 'public');
+    const repositoryOutput = path.resolve(import.meta.dirname, '../../public');
+    await mkdir(repositoryOutput, { recursive: true });
+    await cp(appOutput, repositoryOutput, { recursive: true });
+  },
+});
+
 export default defineConfig({
   base: basePath,
   plugins: [
     react(),
     tailwindcss(),
+    copyRepositoryOutput(),
     runtimeErrorOverlay(),
     ...(process.env.NODE_ENV !== 'production' &&
     process.env.REPL_ID !== undefined
