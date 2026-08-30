@@ -3,15 +3,34 @@ import { and, eq } from "drizzle-orm";
 import { db } from "@workspace/db";
 import { imageUploadsTable, siteContentTable, type SiteContentData } from "@workspace/db/schema";
 import healthRouter from "./health.js";
+import { adminSession, requireAdmin, signInAdmin, signOutAdmin } from "../lib/adminAuth.js";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
 
+router.get("/auth/session", (req, res) => {
+  const session = adminSession(req);
+  res.json({ authenticated: Boolean(session), email: session?.email });
+});
+
+router.post("/auth/login", (req, res) => {
+  if (!signInAdmin(req, res)) {
+    res.status(401).json({ message: "Incorrect email or password." });
+    return;
+  }
+  res.json({ authenticated: true });
+});
+
+router.post("/auth/logout", (_req, res) => {
+  signOutAdmin(res);
+  res.status(204).end();
+});
+
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
 
-router.post("/uploads", async (req, res) => {
+router.post("/uploads", requireAdmin, async (req, res) => {
   try {
     const { data, fileName = "gallery-image", mimeType } = req.body as {
       data?: string;
@@ -109,7 +128,7 @@ router.get("/site-content", async (_req, res) => {
   catch (error) { res.status(500).json({ message: "Unable to load site content", error }); }
 });
 
-router.put("/site-content", async (req, res) => {
+router.put("/site-content", requireAdmin, async (req, res) => {
   try {
     const current = await readContent();
     const next = { ...current, ...req.body } as SiteContentData;
@@ -127,7 +146,7 @@ router.post("/admissions", async (req, res) => {
   } catch (error) { res.status(400).json({ message: "Unable to save admission enquiry", error }); }
 });
 
-router.patch("/admissions/:id", async (req, res) => {
+router.patch("/admissions/:id", requireAdmin, async (req, res) => {
   try {
     const current = await readContent();
     const admissions = current.admissions.map((item: unknown) => item && typeof item === "object" && "id" in item && item.id === req.params.id ? { ...item, status: req.body.status } : item);

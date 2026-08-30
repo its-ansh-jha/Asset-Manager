@@ -25,6 +25,7 @@ import {
   GraduationCap,
   Image as ImageIcon,
   LayoutDashboard,
+  LogOut,
   Layers3,
   Mail,
   MapPin,
@@ -60,6 +61,10 @@ type ContentContextValue = {
   reset: () => void;
   connected: boolean;
   saving: boolean;
+  authenticated: boolean;
+  authReady: boolean;
+  login: (email: string, password: string) => Promise<{ ok: boolean; message?: string }>;
+  logout: () => Promise<void>;
 };
 const ContentContext = createContext<ContentContextValue | null>(null);
 
@@ -68,6 +73,15 @@ function ContentProvider({ children }: { children: ReactNode }) {
   const [ready, setReady] = useState(false);
   const [connected, setConnected] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [authReady, setAuthReady] = useState(false);
+  useEffect(() => {
+    fetch("/api/auth/session", { credentials: "include" })
+      .then((response) => response.json() as Promise<{ authenticated: boolean }>)
+      .then((session) => setAuthenticated(session.authenticated))
+      .catch(() => setAuthenticated(false))
+      .finally(() => setAuthReady(true));
+  }, []);
   useEffect(() => {
     fetch("/api/site-content")
       .then((response) => {
@@ -82,7 +96,7 @@ function ContentProvider({ children }: { children: ReactNode }) {
       .finally(() => setReady(true));
   }, []);
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || !authenticated) return;
     const saveTimer = window.setTimeout(() => {
       setSaving(true);
       fetch("/api/site-content", {
@@ -107,8 +121,32 @@ function ContentProvider({ children }: { children: ReactNode }) {
       reset: () => setContent(defaultContent),
       connected,
       saving,
+      authenticated,
+      authReady,
+      login: async (email: string, password: string) => {
+        try {
+          const response = await fetch("/api/auth/login", {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          if (!response.ok) {
+            const body = (await response.json().catch(() => null)) as { message?: string } | null;
+            return { ok: false, message: body?.message || "Unable to sign in." };
+          }
+          setAuthenticated(true);
+          return { ok: true };
+        } catch {
+          return { ok: false, message: "Unable to reach the server. Try again." };
+        }
+      },
+      logout: async () => {
+        await fetch("/api/auth/logout", { method: "POST", credentials: "include" }).catch(() => undefined);
+        setAuthenticated(false);
+      },
     }),
-    [content, connected, saving],
+    [content, connected, saving, authenticated, authReady],
   );
   return (
     <ContentContext.Provider value={value}>{children}</ContentContext.Provider>
@@ -1983,9 +2021,68 @@ function getAdminTab() {
     ? requested
     : "overview";
 }
+
+function AdminLogin() {
+  const { login } = useContent();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const submit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setError("");
+    setSubmitting(true);
+    const result = await login(email.trim(), password);
+    setSubmitting(false);
+    if (!result.ok) setError(result.message || "Unable to sign in.");
+  };
+  return (
+    <main className="admin-login-shell">
+      <section className="admin-login-card" aria-labelledby="admin-login-title">
+        <a className="admin-login-brand" href="/" aria-label="Return to school website">
+          <span className="brand-seal">MGPS</span>
+          <span>Maa Gayatri Public School</span>
+        </a>
+        <div className="admin-login-copy">
+          <span className="eyebrow">Secure school CMS</span>
+          <h1 id="admin-login-title">Welcome back.</h1>
+          <p>Sign in to update school information, admissions, notices and photographs.</p>
+        </div>
+        <form className="admin-login-form" onSubmit={submit}>
+          <label>
+            <span>Email address</span>
+            <input
+              type="email"
+              autoComplete="username"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              required
+            />
+          </label>
+          <label>
+            <span>Password</span>
+            <input
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </label>
+          {error && <p className="admin-login-error" role="alert">{error}</p>}
+          <button className="button-primary admin-login-submit" type="submit" disabled={submitting}>
+            <ShieldCheck size={17} /> {submitting ? "Signing in…" : "Sign in securely"}
+          </button>
+        </form>
+        <p className="admin-login-note"><ShieldCheck size={14} /> Your session is protected and expires automatically.</p>
+      </section>
+    </main>
+  );
+}
+
 function AdminDashboard() {
   const [tab, setTabState] = useState<Tab>(getAdminTab);
-  const { reset, connected, saving } = useContent();
+  const { reset, connected, saving, authenticated, authReady, logout } = useContent();
   const setTab = (next: Tab) => {
     if (next === tab) return;
     const url = new URL(window.location.href);
@@ -2007,6 +2104,10 @@ function AdminDashboard() {
     admissions: "Admissions",
     people: "Faculty & school",
   };
+  if (!authReady) {
+    return <main className="admin-login-shell"><div className="admin-login-loading">Checking secure access…</div></main>;
+  }
+  if (!authenticated) return <AdminLogin />;
   return (
     <div className="admin-shell">
       <AdminSidebar tab={tab} setTab={setTab} />
@@ -2032,6 +2133,9 @@ function AdminDashboard() {
           {tab === "overview" && <span>Dashboard</span>}
           <ChevronRight size={14} />
           <strong>{titles[tab]}</strong>
+          <button className="admin-logout" onClick={() => void logout()}>
+            <LogOut size={14} /> Sign out
+          </button>
         </div>
         {tab === "overview" && <AdminOverview setTab={setTab} />}
         {tab === "content" && <AdminContent />}
