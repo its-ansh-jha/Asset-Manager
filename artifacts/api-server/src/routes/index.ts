@@ -1,12 +1,58 @@
 import { Router, type IRouter } from "express";
 import { and, eq } from "drizzle-orm";
 import { db } from "@workspace/db";
-import { siteContentTable, type SiteContentData } from "@workspace/db/schema";
+import { imageUploadsTable, siteContentTable, type SiteContentData } from "@workspace/db/schema";
 import healthRouter from "./health.js";
 
 const router: IRouter = Router();
 
 router.use(healthRouter);
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const allowedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
+router.post("/uploads", async (req, res) => {
+  try {
+    const { data, fileName = "gallery-image", mimeType } = req.body as {
+      data?: string;
+      fileName?: string;
+      mimeType?: string;
+    };
+    if (!data || !mimeType || !allowedImageTypes.has(mimeType)) {
+      res.status(400).json({ message: "Upload a PNG, JPEG, WebP, or GIF image." });
+      return;
+    }
+    const image = Buffer.from(data, "base64");
+    if (!image.length || image.length > MAX_IMAGE_SIZE) {
+      res.status(400).json({ message: "Images must be 5 MB or smaller." });
+      return;
+    }
+    const id = crypto.randomUUID();
+    await db.insert(imageUploadsTable).values({ id, fileName, mimeType, data: image });
+    res.status(201).json({ url: `/api/uploads/${id}` });
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Unable to upload image", error });
+    return;
+  }
+});
+
+router.get("/uploads/:id", async (req, res) => {
+  try {
+    const [image] = await db.select().from(imageUploadsTable).where(eq(imageUploadsTable.id, req.params.id)).limit(1);
+    if (!image) {
+      res.status(404).json({ message: "Image not found" });
+      return;
+    }
+    res.setHeader("Content-Type", image.mimeType);
+    res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+    res.send(image.data);
+    return;
+  } catch (error) {
+    res.status(500).json({ message: "Unable to load image", error });
+    return;
+  }
+});
 
 const defaultContent: SiteContentData = {
   schoolName: "Maa Gayatri Public School",

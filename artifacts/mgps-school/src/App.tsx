@@ -1612,7 +1612,7 @@ function AdminGallery() {
       ),
     );
   }, [saving, connected]);
-  const uploadImage = (id: string, file?: File) => {
+  const uploadImage = async (id: string, file?: File) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
       setUploadState((current) => ({
@@ -1668,16 +1668,36 @@ function AdminGallery() {
           message: "The image could not be read.",
         },
       }));
-    reader.onload = () => {
-      edit(id, "image", String(reader.result));
+    reader.onload = async () => {
+      const result = String(reader.result);
+      const [, data = ""] = result.split(",", 2);
       setUploadState((current) => ({
         ...current,
         [id]: {
-          progress: 96,
+          progress: 45,
           status: "saving",
-          message: "Uploading to database…",
+          message: "Uploading image to server…",
         },
       }));
+      try {
+        const response = await fetch("/api/uploads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ data, fileName: file.name, mimeType: file.type }),
+        });
+        if (!response.ok) throw new Error("Upload failed");
+        const { url } = (await response.json()) as { url: string };
+        edit(id, "image", url);
+        setUploadState((current) => ({
+          ...current,
+          [id]: { progress: 100, status: "saved", message: "Uploaded — URL saved to gallery" },
+        }));
+      } catch {
+        setUploadState((current) => ({
+          ...current,
+          [id]: { progress: 0, status: "error", message: "Upload failed. Please try again." },
+        }));
+      }
     };
     reader.readAsDataURL(file);
   };
@@ -1690,8 +1710,8 @@ function AdminGallery() {
         actionLabel="Add image"
       />
       <p className="admin-help">
-        Choose an image from the device. It is uploaded to the database and
-        remains available after a Vercel redeploy. Images are limited to 5 MB.
+        Choose an image from the device. It is stored on the server and the
+        generated image URL is saved here. Images are limited to 5 MB.
       </p>
       <div className="admin-edit-list gallery-admin-list">
         {content.gallery.map((item) => (
@@ -1723,7 +1743,7 @@ function AdminGallery() {
                 </button>
               </div>
               <AdminField
-                label="Hosted image URL (optional)"
+                label="Image URL"
                 value={item.image || ""}
                 onChange={(value) => edit(item.id, "image", value)}
               />
