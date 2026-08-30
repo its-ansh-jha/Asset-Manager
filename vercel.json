@@ -2,5 +2,9 @@
   "version": 2,
   "framework": null,
   "buildCommand": "pnpm --filter @workspace/api-server build && pnpm --filter @workspace/mgps-school build",
-  "outputDirectory": "artifacts/mgps-school/public"
+  "outputDirectory": "artifacts/mgps-school/public",
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
 }
