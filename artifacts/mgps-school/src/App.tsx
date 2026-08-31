@@ -195,6 +195,7 @@ function Brand() {
 
 function Header() {
   const { content } = useContent();
+  const [location] = useLocation();
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -220,7 +221,12 @@ function Header() {
           <Brand />
           <nav className="desktop-nav" aria-label="Primary navigation">
             {publicNav.map(([label, href]) => (
-              <a className="nav-link" href={href} key={href}>
+              <a
+                className={`nav-link${location === href ? " active" : ""}`}
+                href={href}
+                key={href}
+                aria-current={location === href ? "page" : undefined}
+              >
                 {label}
               </a>
             ))}
@@ -246,7 +252,13 @@ function Header() {
       >
         <div className="container-wide">
           {publicNav.map(([label, href]) => (
-            <a href={href} onClick={() => setOpen(false)} key={href}>
+            <a
+              className={location === href ? "active" : undefined}
+              href={href}
+              onClick={() => setOpen(false)}
+              key={href}
+              aria-current={location === href ? "page" : undefined}
+            >
               {label}
             </a>
           ))}
@@ -299,9 +311,18 @@ function PageHeader({
   return (
     <section className="page-hero">
       <div className="container-wide">
+        <div className="page-hero-crumbs" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <ChevronRight size={14} aria-hidden="true" />
+          <span>{eyebrow.replace(/^\d+\s*\/\s*/, "")}</span>
+        </div>
         <div className="eyebrow eyebrow-light">{eyebrow}</div>
         <h1 className="section-heading">{title}</h1>
         <p>{copy}</p>
+        <div className="page-hero-details" aria-label="School information">
+          <span><ShieldCheck size={15} aria-hidden="true" /> Established 2013</span>
+          <span><MapPin size={15} aria-hidden="true" /> Muzaffarpur, Bihar</span>
+        </div>
       </div>
     </section>
   );
@@ -327,6 +348,20 @@ function Hero() {
           <a className="button-quiet" href="/about">
             Explore Our School
           </a>
+        </div>
+        <div className="hero-ledger" aria-label="School at a glance">
+          <div>
+            <strong>2013</strong>
+            <span>Established</span>
+          </div>
+          <div>
+            <strong>English</strong>
+            <span>Medium school</span>
+          </div>
+          <div>
+            <strong>Secondary</strong>
+            <span>Learning journey</span>
+          </div>
         </div>
         <div className="hero-note">
           <MapPin size={14} /> {content.address}
