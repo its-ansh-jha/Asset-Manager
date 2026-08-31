@@ -338,34 +338,47 @@ function Hero() {
         </span>
       </div>
       <div className="container-wide hero-content">
-        <div className="hero-kicker">A school for the road ahead</div>
-        <h1 className="display-font">{content.heroTitle}</h1>
-        <p>{content.heroCopy}</p>
-        <div className="hero-actions">
-          <a className="button-primary" href="/admissions">
-            Online Admission Enquiry <ChevronRight size={17} />
-          </a>
-          <a className="button-quiet" href="/about">
-            Explore Our School
-          </a>
-        </div>
-        <div className="hero-ledger" aria-label="School at a glance">
-          <div>
-            <strong>2013</strong>
-            <span>Established</span>
+        <div className="hero-copy">
+          <div className="hero-kicker">A school for the road ahead</div>
+          <h1 className="display-font">{content.heroTitle}</h1>
+          <p>{content.heroCopy}</p>
+          <div className="hero-actions">
+            <a className="button-primary" href="/admissions">
+              Online Admission Enquiry <ChevronRight size={17} />
+            </a>
+            <a className="button-quiet" href="/about">
+              Explore Our School
+            </a>
           </div>
-          <div>
-            <strong>English</strong>
-            <span>Medium school</span>
+          <div className="hero-ledger" aria-label="School at a glance">
+            <div>
+              <strong>2013</strong>
+              <span>Established</span>
+            </div>
+            <div>
+              <strong>English</strong>
+              <span>Medium school</span>
+            </div>
+            <div>
+              <strong>Secondary</strong>
+              <span>Learning journey</span>
+            </div>
           </div>
-          <div>
-            <strong>Secondary</strong>
-            <span>Learning journey</span>
+          <div className="hero-note">
+            <MapPin size={14} /> {content.address}
           </div>
         </div>
-        <div className="hero-note">
-          <MapPin size={14} /> {content.address}
-        </div>
+        <aside className="hero-spotlight" aria-label="School highlights">
+          <div className="hero-spotlight-mark"><GraduationCap size={26} /></div>
+          <span className="hero-spotlight-label">Learning with purpose</span>
+          <h2>A confident start for every child.</h2>
+          <p>A caring school environment for focused learning, friendships and growth.</p>
+          <div className="hero-spotlight-list">
+            <span><BookOpen size={16} /> English-medium learning</span>
+            <span><Users size={16} /> Co-educational school</span>
+            <span><MapPin size={16} /> Rooted in Muzaffarpur</span>
+          </div>
+        </aside>
       </div>
       <div className="container-wide quick-contact">
         <a href={phoneHref(content.phone)}>
