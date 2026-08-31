@@ -45,6 +45,7 @@ import {
   X,
 } from "lucide-react";
 import { Route, Switch, Router as WouterRouter, useLocation } from "wouter";
+import schoolLogo from "./assets/mgps-school-logo.jpg";
 import {
   defaultContent,
   type Admission,
@@ -183,7 +184,7 @@ function Brand() {
       aria-label={`${content.schoolName} home`}
     >
       <span className="brand-seal" aria-hidden="true">
-        <img src="/images/mgps-school-logo.jpg" alt="" />
+        <img src={schoolLogo} alt="" />
       </span>
       <span>
         <span className="brand-name">{content.schoolName}</span>
@@ -1202,7 +1203,7 @@ function AdminSidebar({
   return (
     <aside className="admin-sidebar">
       <a className="admin-brand" href="/">
-        <span className="brand-seal" aria-hidden="true"><img src="/images/mgps-school-logo.jpg" alt="" /></span>
+        <span className="brand-seal" aria-hidden="true"><img src={schoolLogo} alt="" /></span>
         <span>
           <strong>School CMS</strong>
           <small>{"Maa Gayatri Public School"}</small>
@@ -2105,7 +2106,7 @@ function AdminLogin() {
     <main className="admin-login-shell">
       <section className="admin-login-card" aria-labelledby="admin-login-title">
         <a className="admin-login-brand" href="/" aria-label="Return to school website">
-          <span className="brand-seal" aria-hidden="true"><img src="/images/mgps-school-logo.jpg" alt="" /></span>
+          <span className="brand-seal" aria-hidden="true"><img src={schoolLogo} alt="" /></span>
           <span>Maa Gayatri Public School</span>
         </a>
         <div className="admin-login-copy">
@@ -2179,7 +2180,7 @@ function AdminDashboard() {
       <main className="admin-main">
         <div className="admin-mobile-top">
           <a href="/">
-            <span className="brand-seal" aria-hidden="true"><img src="/images/mgps-school-logo.jpg" alt="" /></span>
+            <span className="brand-seal" aria-hidden="true"><img src={schoolLogo} alt="" /></span>
           </a>
           <span>School CMS</span>
           <a href="/">
