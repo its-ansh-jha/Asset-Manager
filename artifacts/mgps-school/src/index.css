@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -28,30 +28,30 @@
 }
 
 :root {
-  --background: 42 38% 97%;
-  --foreground: 218 45% 14%;
+  --background: 210 33% 98%;
+  --foreground: 222 47% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 218 45% 14%;
+  --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 218 45% 14%;
-  --primary: 218 66% 23%;
-  --primary-foreground: 42 38% 97%;
-  --secondary: 211 35% 93%;
-  --secondary-foreground: 218 66% 23%;
-  --muted: 38 25% 91%;
-  --muted-foreground: 215 18% 43%;
-  --accent: 41 79% 59%;
-  --accent-foreground: 218 66% 17%;
-  --border: 38 20% 84%;
-  --input: 38 20% 84%;
-  --ring: 41 79% 59%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 222 47% 15%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 205 38% 94%;
+  --secondary-foreground: 222 47% 15%;
+  --muted: 210 31% 93%;
+  --muted-foreground: 215 16% 42%;
+  --accent: 168 62% 32%;
+  --accent-foreground: 0 0% 100%;
+  --border: 214 27% 87%;
+  --input: 214 27% 87%;
+  --ring: 168 62% 32%;
   --destructive: 0 64% 43%;
-  --app-font-sans: "DM Sans", ui-sans-serif, sans-serif;
-  --app-font-serif: "Playfair Display", Georgia, serif;
+  --app-font-sans: "Manrope", ui-sans-serif, sans-serif;
+  --app-font-serif: "Lora", Georgia, serif;
   --app-font-mono: ui-monospace, monospace;
-  --radius: 1rem;
-  --shadow-card: 0 14px 42px rgba(22, 44, 73, 0.08);
-  --shadow-deep: 0 24px 62px rgba(20, 45, 77, 0.17);
+  --radius: 0.85rem;
+  --shadow-card: 0 10px 30px rgba(15, 28, 49, 0.08);
+  --shadow-deep: 0 20px 52px rgba(15, 28, 49, 0.15);
 }
 
 .dark {
@@ -1506,9 +1506,9 @@
 }
 .hero-art {
   background:
-    radial-gradient(circle at 83% 20%, rgba(244, 203, 104, 0.7), transparent 7%),
-    radial-gradient(circle at 72% 76%, rgba(103, 153, 194, 0.64), transparent 30%),
-    linear-gradient(135deg, #0e3158 0%, #27587e 51%, #b2985d 160%);
+    radial-gradient(circle at 83% 20%, rgba(50, 184, 166, 0.38), transparent 8%),
+    radial-gradient(circle at 72% 76%, rgba(63, 129, 192, 0.53), transparent 31%),
+    linear-gradient(135deg, #101c33 0%, #1f4169 53%, #16857b 165%);
 }
 .hero-art::before { opacity: 0.18; transform: rotate(-7deg) scale(1.15); }
 .hero-content {
@@ -1600,7 +1600,7 @@
 .trust-grid { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 18px; box-shadow: var(--shadow-card); overflow: hidden; }
 .trust-item { min-height: 120px; padding: 25px 18px; transition: background-color 0.2s ease; }
 .trust-item:first-child { padding-left: 18px; }
-.trust-item:hover { background: hsl(41 54% 94%); }
+.trust-item:hover { background: hsl(168 43% 96%); }
 .trust-item > svg { color: hsl(var(--accent)); flex: 0 0 auto; }
 .section-pad { padding-block: clamp(82px, 10vw, 142px); }
 .section-pad > .container-wide > .eyebrow,
@@ -1619,7 +1619,7 @@
 .academic-board { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 18px; box-shadow: var(--shadow-card); overflow: hidden; }
 .academic-row { border-bottom-color: hsl(var(--border)); padding: 30px; }
 .academic-row:last-child { border-bottom: 0; }
-.academic-row:hover { background: hsl(41 54% 94%); padding-left: 38px; }
+.academic-row:hover { background: hsl(205 43% 96%); padding-left: 38px; }
 .academic-note { border-radius: 0 12px 12px 0; box-shadow: 0 8px 18px rgba(36, 56, 74, 0.06); }
 .section-band { background: hsl(211 35% 94%); }
 .person-card { border-radius: 18px; min-height: 175px; padding: 24px; }
@@ -1673,6 +1673,175 @@
   .notice-card, .notice-card.featured { grid-template-columns: 58px 1fr 15px; padding: 18px 14px; }
   .page-hero { padding-block: 66px 76px; }
   .page-hero .section-heading { font-size: clamp(2.65rem, 11vw, 3.7rem); }
+}
+
+/* Professional academic theme: clear, calm, and built for parent confidence. */
+body {
+  letter-spacing: -0.01em;
+}
+.announcement-inner,
+.nav-inner {
+  max-width: 1260px;
+}
+.button-primary,
+.button-quiet {
+  border-radius: 10px;
+  font-size: 0.8rem;
+  letter-spacing: 0.01em;
+  min-height: 46px;
+}
+.button-primary {
+  box-shadow: 0 8px 18px hsl(var(--accent) / 0.2);
+}
+.button-primary:hover {
+  background: hsl(168 62% 27%);
+  box-shadow: 0 12px 24px hsl(var(--accent) / 0.27);
+}
+.button-quiet {
+  border-color: rgba(255, 255, 255, 0.42);
+}
+.text-link:hover,
+.nav-link.active,
+.mobile-menu a.active,
+.notice-category,
+.admin-panel-title span {
+  color: hsl(var(--accent));
+}
+.nav-bar.is-scrolled {
+  box-shadow: 0 9px 24px rgba(15, 28, 49, 0.08);
+}
+.brand-seal {
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(218 45% 27%));
+  border-color: hsl(var(--accent));
+}
+.hero {
+  background: hsl(var(--primary));
+}
+.hero::before {
+  background: linear-gradient(100deg, rgba(9, 20, 38, 0.98), rgba(16, 39, 69, 0.93) 52%, rgba(14, 56, 79, 0.57));
+}
+.hero-spotlight {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), rgba(19, 79, 100, 0.12));
+  border-radius: 14px;
+}
+.hero-spotlight-mark {
+  background: hsl(var(--accent));
+  border-radius: 9px;
+  color: white;
+}
+.hero-ledger {
+  background: rgba(255, 255, 255, 0.065);
+  border-radius: 0 10px 10px 0;
+}
+.quick-contact {
+  border-radius: 10px;
+}
+.quick-contact a:hover {
+  background: hsl(168 43% 96%);
+  color: hsl(var(--accent));
+}
+.trust-grid,
+.academic-board,
+.form-card,
+.contact-card,
+.admission-aside,
+.editorial-frame {
+  border-radius: 12px;
+}
+.trust-item:hover,
+.academic-row:hover {
+  background: hsl(205 43% 96%);
+}
+.section-band {
+  background: linear-gradient(180deg, hsl(205 39% 95%), hsl(var(--background)));
+}
+.section-pad > .container-wide > .eyebrow,
+.section-topline .eyebrow {
+  color: hsl(var(--accent));
+}
+.about-copy p::first-letter {
+  color: hsl(var(--accent));
+  float: left;
+  font-family: var(--app-font-serif);
+  font-size: 3.5em;
+  font-weight: 700;
+  line-height: 0.78;
+  margin: 0.1em 0.12em 0 0;
+}
+.editorial-frame {
+  background: linear-gradient(145deg, hsl(205 42% 91%), hsl(182 35% 84%));
+}
+.frame-pattern {
+  background: repeating-linear-gradient(135deg, transparent 0 28px, rgba(15, 118, 110, 0.1) 29px 30px);
+}
+.about-tag {
+  border-color: hsl(var(--background));
+}
+.beliefs,
+.contact-section {
+  background: linear-gradient(130deg, hsl(222 47% 15%), hsl(214 44% 25%) 65%, hsl(178 51% 26%));
+}
+.belief-card,
+.person-card,
+.achievement-card,
+.facility-card,
+.notice-card {
+  border-radius: 12px;
+}
+.person-card:hover,
+.achievement-card:hover,
+.facility-card:hover {
+  border-color: hsl(var(--accent) / 0.5);
+  box-shadow: 0 12px 28px rgba(15, 28, 49, 0.1);
+}
+.facility-icon {
+  background: hsl(168 43% 93%);
+  border-radius: 8px;
+  color: hsl(var(--accent));
+}
+.facility-card:hover .facility-icon {
+  background: hsl(var(--accent));
+  color: white;
+}
+.notice-card.featured {
+  background: hsl(168 43% 96%);
+  border-color: hsl(var(--accent) / 0.38);
+}
+.achievement-year,
+.notice-date {
+  color: hsl(var(--accent));
+}
+.gallery-placeholder {
+  border-radius: 12px;
+}
+.admission-wrap {
+  background: linear-gradient(135deg, hsl(205 39% 95%), hsl(168 37% 96%));
+}
+.admission-aside::after,
+.home-welcome-card::after {
+  border-color: rgba(88, 207, 192, 0.23);
+}
+.page-hero {
+  background:
+    radial-gradient(circle at 84% 20%, hsl(var(--accent) / 0.35), transparent 22rem),
+    linear-gradient(135deg, hsl(222 47% 15%), hsl(214 47% 25%) 72%);
+}
+.page-hero::after {
+  border-color: rgba(94, 234, 212, 0.22);
+}
+.footer {
+  background: hsl(222 47% 12%);
+  border-top-color: hsl(var(--accent));
+}
+.mobile-cta a:nth-child(2),
+.mobile-cta a:hover {
+  color: hsl(var(--accent));
+}
+
+@media (max-width: 640px) {
+  .button-primary,
+  .button-quiet { min-height: 48px; }
+  .about-copy p::first-letter { font-size: 3em; }
 }
 @media (prefers-reduced-motion: reduce) {
   html {
