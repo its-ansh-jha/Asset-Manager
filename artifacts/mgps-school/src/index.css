@@ -1759,15 +1759,6 @@ body {
 .section-topline .eyebrow {
   color: hsl(var(--accent));
 }
-.about-copy p::first-letter {
-  color: hsl(var(--accent));
-  float: left;
-  font-family: var(--app-font-serif);
-  font-size: 3.5em;
-  font-weight: 700;
-  line-height: 0.78;
-  margin: 0.1em 0.12em 0 0;
-}
 .editorial-frame {
   background: linear-gradient(145deg, hsl(205 42% 91%), hsl(182 35% 84%));
 }
@@ -1841,7 +1832,6 @@ body {
 @media (max-width: 640px) {
   .button-primary,
   .button-quiet { min-height: 48px; }
-  .about-copy p::first-letter { font-size: 3em; }
 }
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -1933,6 +1923,7 @@ body {
   gap: 25px;
   grid-template-columns: 100px 1fr 20px;
   padding: 26px 0;
+  text-decoration: none;
 }
 .notice-card.featured {
   background: hsl(41 54% 91%);

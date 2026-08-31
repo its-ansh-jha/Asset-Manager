@@ -612,23 +612,40 @@ function NoticesSection({ preview = false }: { preview?: boolean }) {
           )}
         </div>
         <div className="notice-list">
-          {notices.map((notice) => (
-            <article
-              className={`notice-card${notice.featured ? " featured" : ""}`}
-              key={notice.id}
-            >
-              <div className="notice-date">
-                <strong>{notice.date.split(" ")[0]}</strong>
-                <span>{notice.date.split(" ").slice(1).join(" ")}</span>
-              </div>
-              <div className="notice-copy">
-                <span className="notice-category">{notice.category}</span>
-                <h3>{notice.title}</h3>
-                <p>{notice.excerpt}</p>
-              </div>
-              <ArrowRight className="notice-arrow" size={18} />
-            </article>
-          ))}
+          {notices.map((notice) => {
+            const cardContent = (
+              <>
+                <div className="notice-date">
+                  <strong>{notice.date.split(" ")[0]}</strong>
+                  <span>{notice.date.split(" ").slice(1).join(" ")}</span>
+                </div>
+                <div className="notice-copy">
+                  <span className="notice-category">{notice.category}</span>
+                  <h3>{notice.title}</h3>
+                  <p>{notice.excerpt}</p>
+                </div>
+                {preview && <ArrowRight className="notice-arrow" size={18} aria-hidden="true" />}
+              </>
+            );
+            return preview ? (
+              <a
+                className={`notice-card${notice.featured ? " featured" : ""}`}
+                href={`/notices#${notice.id}`}
+                key={notice.id}
+                aria-label={`Read notice: ${notice.title}`}
+              >
+                {cardContent}
+              </a>
+            ) : (
+              <article
+                className={`notice-card${notice.featured ? " featured" : ""}`}
+                id={notice.id}
+                key={notice.id}
+              >
+                {cardContent}
+              </article>
+            );
+          })}
           {notices.length === 0 && (
             <div className="empty-state">No notices published yet.</div>
           )}
