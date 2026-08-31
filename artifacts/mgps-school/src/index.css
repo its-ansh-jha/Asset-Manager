@@ -265,17 +265,25 @@
 }
 .brand-seal {
   align-items: center;
-  background: hsl(var(--primary));
+  background: white;
   border: 1px solid hsl(var(--accent));
   border-radius: 50%;
-  color: hsl(var(--accent));
   display: inline-flex;
   font-size: 0.74rem;
   font-weight: 700;
   height: 42px;
   justify-content: center;
   letter-spacing: 0.06em;
+  overflow: hidden;
+  padding: 2px;
   width: 42px;
+}
+.brand-seal img {
+  border-radius: 50%;
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
 }
 .brand-name {
   color: hsl(var(--primary));
