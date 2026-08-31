@@ -28,30 +28,30 @@
 }
 
 :root {
-  --background: 216 56% 98%;
-  --foreground: 224 63% 14%;
+  --background: 210 33% 98%;
+  --foreground: 222 47% 11%;
   --card: 0 0% 100%;
-  --card-foreground: 224 63% 14%;
+  --card-foreground: 222 47% 11%;
   --popover: 0 0% 100%;
-  --popover-foreground: 224 63% 14%;
-  --primary: 229 88% 34%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 222 47% 15%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 217 70% 95%;
-  --secondary-foreground: 229 88% 28%;
-  --muted: 217 39% 94%;
-  --muted-foreground: 218 17% 40%;
-  --accent: 358 82% 40%;
+  --secondary: 205 38% 94%;
+  --secondary-foreground: 222 47% 15%;
+  --muted: 210 31% 93%;
+  --muted-foreground: 215 16% 42%;
+  --accent: 168 62% 32%;
   --accent-foreground: 0 0% 100%;
-  --border: 218 48% 86%;
-  --input: 218 48% 86%;
-  --ring: 358 82% 40%;
+  --border: 214 27% 87%;
+  --input: 214 27% 87%;
+  --ring: 168 62% 32%;
   --destructive: 0 64% 43%;
   --app-font-sans: "Manrope", ui-sans-serif, sans-serif;
   --app-font-serif: "Lora", Georgia, serif;
   --app-font-mono: ui-monospace, monospace;
   --radius: 0.85rem;
-  --shadow-card: 0 10px 30px rgba(7, 37, 125, 0.09);
-  --shadow-deep: 0 22px 56px rgba(7, 37, 125, 0.16);
+  --shadow-card: 0 10px 30px rgba(15, 28, 49, 0.08);
+  --shadow-deep: 0 20px 52px rgba(15, 28, 49, 0.15);
 }
 
 .dark {
@@ -210,7 +210,7 @@
   box-shadow: 0 8px 22px rgba(210, 159, 58, 0.2);
 }
 .button-primary:hover {
-  background: hsl(358 82% 47%);
+  background: hsl(41 79% 66%);
   box-shadow: 0 12px 28px rgba(210, 159, 58, 0.27);
   transform: translateY(-2px);
 }
@@ -232,7 +232,7 @@
   text-decoration: none;
 }
 .text-link:hover {
-  color: hsl(358 82% 34%);
+  color: hsl(41 79% 42%);
 }
 .section-band {
   background: hsl(211 35% 93%);
@@ -351,7 +351,7 @@
     140deg,
     #122e4f 0%,
     #537395 54%,
-    #d7141b 100%
+    #d4b16b 100%
   );
   inset: 0;
   overflow: hidden;
@@ -505,7 +505,7 @@
     color 0.2s ease;
 }
 .quick-contact a:hover {
-  color: hsl(358 82% 34%);
+  color: hsl(41 79% 42%);
   transform: translateY(-3px);
 }
 .quick-contact svg {
@@ -1514,9 +1514,9 @@
 }
 .hero-art {
   background:
-    radial-gradient(circle at 83% 20%, rgba(232, 21, 27, 0.46), transparent 8%),
+    radial-gradient(circle at 83% 20%, rgba(50, 184, 166, 0.38), transparent 8%),
     radial-gradient(circle at 72% 76%, rgba(63, 129, 192, 0.53), transparent 31%),
-    linear-gradient(135deg, #101c33 0%, #1f4169 53%, #d7141b 165%);
+    linear-gradient(135deg, #101c33 0%, #1f4169 53%, #16857b 165%);
 }
 .hero-art::before { opacity: 0.18; transform: rotate(-7deg) scale(1.15); }
 .hero-content {
@@ -1608,7 +1608,7 @@
 .trust-grid { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 18px; box-shadow: var(--shadow-card); overflow: hidden; }
 .trust-item { min-height: 120px; padding: 25px 18px; transition: background-color 0.2s ease; }
 .trust-item:first-child { padding-left: 18px; }
-.trust-item:hover { background: hsl(217 70% 96%); }
+.trust-item:hover { background: hsl(168 43% 96%); }
 .trust-item > svg { color: hsl(var(--accent)); flex: 0 0 auto; }
 .section-pad { padding-block: clamp(82px, 10vw, 142px); }
 .section-pad > .container-wide > .eyebrow,
@@ -1627,7 +1627,7 @@
 .academic-board { background: hsl(var(--card)); border: 1px solid hsl(var(--border)); border-radius: 18px; box-shadow: var(--shadow-card); overflow: hidden; }
 .academic-row { border-bottom-color: hsl(var(--border)); padding: 30px; }
 .academic-row:last-child { border-bottom: 0; }
-.academic-row:hover { background: hsl(217 70% 96%); padding-left: 38px; }
+.academic-row:hover { background: hsl(205 43% 96%); padding-left: 38px; }
 .academic-note { border-radius: 0 12px 12px 0; box-shadow: 0 8px 18px rgba(36, 56, 74, 0.06); }
 .section-band { background: hsl(211 35% 94%); }
 .person-card { border-radius: 18px; min-height: 175px; padding: 24px; }
@@ -1702,7 +1702,7 @@ body {
   box-shadow: 0 8px 18px hsl(var(--accent) / 0.2);
 }
 .button-primary:hover {
-  background: hsl(358 82% 34%);
+  background: hsl(168 62% 27%);
   box-shadow: 0 12px 24px hsl(var(--accent) / 0.27);
 }
 .button-quiet {
@@ -1745,7 +1745,7 @@ body {
   border-radius: 10px;
 }
 .quick-contact a:hover {
-  background: hsl(217 70% 96%);
+  background: hsl(168 43% 96%);
   color: hsl(var(--accent));
 }
 .trust-grid,
@@ -1758,7 +1758,7 @@ body {
 }
 .trust-item:hover,
 .academic-row:hover {
-  background: hsl(217 70% 96%);
+  background: hsl(205 43% 96%);
 }
 .section-band {
   background: linear-gradient(180deg, hsl(205 39% 95%), hsl(var(--background)));
@@ -1778,7 +1778,7 @@ body {
 }
 .beliefs,
 .contact-section {
-  background: linear-gradient(130deg, hsl(222 47% 15%), hsl(214 44% 25%) 65%, hsl(227 77% 39%));
+  background: linear-gradient(130deg, hsl(222 47% 15%), hsl(214 44% 25%) 65%, hsl(178 51% 26%));
 }
 .belief-card,
 .person-card,
@@ -1794,7 +1794,7 @@ body {
   box-shadow: 0 12px 28px rgba(15, 28, 49, 0.1);
 }
 .facility-icon {
-  background: hsl(217 70% 94%);
+  background: hsl(168 43% 93%);
   border-radius: 8px;
   color: hsl(var(--accent));
 }
@@ -1803,7 +1803,7 @@ body {
   color: white;
 }
 .notice-card.featured {
-  background: hsl(217 70% 96%);
+  background: hsl(168 43% 96%);
   border-color: hsl(var(--accent) / 0.38);
 }
 .achievement-year,
@@ -1814,11 +1814,11 @@ body {
   border-radius: 12px;
 }
 .admission-wrap {
-  background: linear-gradient(135deg, hsl(205 39% 95%), hsl(0 62% 98%));
+  background: linear-gradient(135deg, hsl(205 39% 95%), hsl(168 37% 96%));
 }
 .admission-aside::after,
 .home-welcome-card::after {
-  border-color: rgba(232, 21, 27, 0.23);
+  border-color: rgba(88, 207, 192, 0.23);
 }
 .page-hero {
   background:
@@ -1957,7 +1957,7 @@ body {
   text-transform: uppercase;
 }
 .notice-category {
-  color: hsl(358 75% 36%);
+  color: hsl(41 65% 38%);
   font-size: 0.66rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2221,7 +2221,7 @@ body {
   margin: 38px 0 28px;
 }
 .admin-login-copy .eyebrow {
-  color: hsl(358 75% 36%);
+  color: hsl(41 65% 38%);
 }
 .admin-login-copy h1 {
   color: hsl(var(--primary));
@@ -2378,7 +2378,7 @@ body {
   color: hsl(var(--accent));
 }
 .admin-panel-title span {
-  color: hsl(358 75% 36%);
+  color: hsl(41 65% 38%);
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2874,7 +2874,7 @@ body {
   transform: scaleX(1);
 }
 .mobile-menu a.active {
-  color: hsl(358 75% 36%);
+  color: hsl(41 65% 38%);
 }
 .hero {
   isolation: isolate;
