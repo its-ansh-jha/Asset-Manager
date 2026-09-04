@@ -90,11 +90,11 @@ const defaultContent: SiteContentData = {
     { id: "n3", title: "Parent–teacher meeting schedule", date: "05 Aug 2026", category: "Circular", excerpt: "Please contact the class teacher for the latest meeting time and details." },
   ],
   gallery: [
-    { id: "g1", title: "Campus life", caption: "Add an approved campus photograph" },
-    { id: "g2", title: "Classroom learning", caption: "Add an approved classroom photograph" },
-    { id: "g3", title: "School activities", caption: "Add an approved activity photograph" },
-    { id: "g4", title: "Learning environment", caption: "Add an approved school photograph" },
-    { id: "g5", title: "Celebrations", caption: "Add an approved event photograph" },
+    { id: "g1", title: "Campus life", caption: "Add an approved campus photograph", image: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=85" },
+    { id: "g2", title: "Classroom learning", caption: "Add an approved classroom photograph", image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85" },
+    { id: "g3", title: "School activities", caption: "Add an approved activity photograph", image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85" },
+    { id: "g4", title: "Learning environment", caption: "Add an approved school photograph", image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=85" },
+    { id: "g5", title: "Celebrations", caption: "Add an approved event photograph", image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85" },
   ],
   faculty: [
     { id: "f1", name: "School Leadership", role: "Academic guidance & administration", subject: "School leadership", initials: "SL" },

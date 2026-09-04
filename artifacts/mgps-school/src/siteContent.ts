@@ -105,26 +105,31 @@ export const defaultContent: SiteContent = {
       id: "g1",
       title: "Campus life",
       caption: "Add an approved campus photograph",
+      image: "https://images.unsplash.com/photo-1562774053-701939374585?auto=format&fit=crop&w=1200&q=85",
     },
     {
       id: "g2",
       title: "Classroom learning",
       caption: "Add an approved classroom photograph",
+      image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=85",
     },
     {
       id: "g3",
       title: "School activities",
       caption: "Add an approved activity photograph",
+      image: "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=85",
     },
     {
       id: "g4",
       title: "Learning environment",
       caption: "Add an approved school photograph",
+      image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?auto=format&fit=crop&w=1200&q=85",
     },
     {
       id: "g5",
       title: "Celebrations",
       caption: "Add an approved event photograph",
+      image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85",
     },
   ],
   faculty: [
