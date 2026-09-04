@@ -611,7 +611,14 @@ function AboutSection() {
           </a>
         </div>
         <div className="about-visual">
-          <div className="editorial-frame">
+          <div
+            className="editorial-frame"
+            style={
+              content.gallery[0]?.image
+                ? { backgroundImage: `linear-gradient(rgba(19,56,95,.18),rgba(19,56,95,.58)), url(${content.gallery[0].image})` }
+                : undefined
+            }
+          >
             <div className="frame-pattern" />
             <div className="frame-copy">
               <div className="frame-number">13</div>
@@ -738,7 +745,13 @@ function FacultySection() {
         <div className="people-grid">
           {content.faculty.map((person) => (
             <article className="person-card" key={person.id}>
-              <div className="person-avatar">{person.initials}</div>
+              <div className="person-avatar">
+                {person.image ? (
+                  <img src={person.image} alt={`${person.name} profile`} loading="lazy" />
+                ) : (
+                  person.initials
+                )}
+              </div>
               <div>
                 <h3>{person.name}</h3>
                 <p>{person.role}</p>
@@ -2143,7 +2156,7 @@ function AdminPeople() {
     ]);
   const edit = (
     id: string,
-    key: "name" | "role" | "subject" | "initials",
+    key: "name" | "role" | "subject" | "initials" | "image",
     value: string,
   ) =>
     update(
@@ -2184,6 +2197,11 @@ function AdminPeople() {
                 label="Subject / area"
                 value={item.subject}
                 onChange={(value) => edit(item.id, "subject", value)}
+              />
+              <AdminField
+                label="Profile image URL"
+                value={item.image || ""}
+                onChange={(value) => edit(item.id, "image", value)}
               />
             </div>
             <button

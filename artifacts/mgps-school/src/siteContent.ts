@@ -20,6 +20,7 @@ export type FacultyMember = {
   role: string;
   subject: string;
   initials: string;
+  image?: string;
 };
 
 export type Admission = {
@@ -139,6 +140,7 @@ export const defaultContent: SiteContent = {
       role: "Academic guidance & administration",
       subject: "School leadership",
       initials: "SL",
+      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=85",
     },
     {
       id: "f2",
@@ -146,6 +148,7 @@ export const defaultContent: SiteContent = {
       role: "Foundational learning",
       subject: "Primary years",
       initials: "PF",
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=85",
     },
     {
       id: "f3",
@@ -153,6 +156,7 @@ export const defaultContent: SiteContent = {
       role: "Subject learning & mentoring",
       subject: "Secondary years",
       initials: "SF",
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=85",
     },
     {
       id: "f4",
@@ -160,6 +164,7 @@ export const defaultContent: SiteContent = {
       role: "Care, coordination & activities",
       subject: "Student wellbeing",
       initials: "SS",
+      image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=85",
     },
   ],
   achievements: [

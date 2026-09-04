@@ -97,10 +97,10 @@ const defaultContent: SiteContentData = {
     { id: "g5", title: "Celebrations", caption: "Add an approved event photograph", image: "https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=1200&q=85" },
   ],
   faculty: [
-    { id: "f1", name: "School Leadership", role: "Academic guidance & administration", subject: "School leadership", initials: "SL" },
-    { id: "f2", name: "Primary Faculty", role: "Foundational learning", subject: "Primary years", initials: "PF" },
-    { id: "f3", name: "Secondary Faculty", role: "Subject learning & mentoring", subject: "Secondary years", initials: "SF" },
-    { id: "f4", name: "Student Support Team", role: "Care, coordination & activities", subject: "Student wellbeing", initials: "SS" },
+    { id: "f1", name: "School Leadership", role: "Academic guidance & administration", subject: "School leadership", initials: "SL", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&w=600&q=85" },
+    { id: "f2", name: "Primary Faculty", role: "Foundational learning", subject: "Primary years", initials: "PF", image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=600&q=85" },
+    { id: "f3", name: "Secondary Faculty", role: "Subject learning & mentoring", subject: "Secondary years", initials: "SF", image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=85" },
+    { id: "f4", name: "Student Support Team", role: "Care, coordination & activities", subject: "Student wellbeing", initials: "SS", image: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=600&q=85" },
   ],
   achievements: [
     { id: "a1", title: "A growing learning community", detail: "Building a steady, supportive school experience for families in Muzaffarpur.", year: "2026" },

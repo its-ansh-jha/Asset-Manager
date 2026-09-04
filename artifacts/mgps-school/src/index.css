@@ -1899,6 +1899,13 @@ body {
   height: 42px;
   margin-top: 3px;
 }
+.person-avatar img {
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
 .person-card h3 {
   color: hsl(var(--primary));
   font-family: var(--app-font-serif);
