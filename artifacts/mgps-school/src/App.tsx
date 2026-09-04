@@ -163,6 +163,163 @@ function scrollToTop() {
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+type SeoPage = {
+  title: string;
+  description: string;
+};
+
+const seoPages: Record<string, SeoPage> = {
+  "/": {
+    title: "Maa Gayatri Public School | English-Medium School in Muzaffarpur, Bihar",
+    description:
+      "Maa Gayatri Public School is an English-medium co-educational school in Muzaffarpur, Bihar. Explore academics, admissions, notices, facilities and school life.",
+  },
+  "/about": {
+    title: "About Us | Maa Gayatri Public School, Muzaffarpur",
+    description:
+      "Learn about Maa Gayatri Public School, its values and its supportive English-medium learning environment in Muzaffarpur, Bihar.",
+  },
+  "/academics": {
+    title: "Academics & Classes | Maa Gayatri Public School",
+    description:
+      "Explore the primary, middle and secondary learning journey at Maa Gayatri Public School in Muzaffarpur.",
+  },
+  "/faculty": {
+    title: "Faculty & Staff | Maa Gayatri Public School",
+    description:
+      "Meet the teachers and staff who guide, teach and support students at Maa Gayatri Public School, Muzaffarpur.",
+  },
+  "/admissions": {
+    title: "Online Admission Enquiry | Maa Gayatri Public School",
+    description:
+      "Submit an online admission enquiry for Maa Gayatri Public School, Muzaffarpur, and receive the latest information from the school office.",
+  },
+  "/notices": {
+    title: "Notices & Announcements | Maa Gayatri Public School",
+    description:
+      "Read the latest school notices, admission updates, events, circulars and announcements from Maa Gayatri Public School.",
+  },
+  "/gallery": {
+    title: "Photo Gallery | Maa Gayatri Public School",
+    description:
+      "Browse campus, classroom, activity and celebration moments from Maa Gayatri Public School in Muzaffarpur.",
+  },
+  "/achievements": {
+    title: "Achievements | Maa Gayatri Public School",
+    description:
+      "Discover the milestones and proud moments of the Maa Gayatri Public School community in Muzaffarpur.",
+  },
+  "/facilities": {
+    title: "Facilities | Maa Gayatri Public School",
+    description:
+      "Explore the school spaces and resources that support learning at Maa Gayatri Public School, Muzaffarpur.",
+  },
+  "/contact": {
+    title: "Contact & Location | Maa Gayatri Public School",
+    description:
+      "Contact Maa Gayatri Public School on Purani Darbhanga Road, Sahwajpur/Shahbazpur, Muzaffarpur, Bihar for school information and admissions.",
+  },
+};
+
+function upsertMeta(selector: string, attributes: Record<string, string>, content: string) {
+  let element = document.head.querySelector<HTMLMetaElement>(selector);
+  if (!element) {
+    element = document.createElement("meta");
+    Object.entries(attributes).forEach(([name, value]) => element?.setAttribute(name, value));
+    document.head.appendChild(element);
+  }
+  element.content = content;
+}
+
+function SeoMetadata({ path, noIndex = false }: { path: string; noIndex?: boolean }) {
+  const { content } = useContent();
+  useEffect(() => {
+    const page = seoPages[path] || {
+      title: `Page not found | ${content.schoolName}`,
+      description: "The page you requested could not be found.",
+    };
+    const origin = window.location.origin.replace(/\/$/, "");
+    const canonicalPath = path === "/" ? "" : path.replace(/\/$/, "");
+    const pageUrl = `${origin}${canonicalPath || "/"}`;
+    const logoUrl = `${origin}/images/mgps-school-logo.jpg`;
+    const robots = noIndex
+      ? "noindex, nofollow"
+      : "index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1";
+    document.title = page.title;
+    upsertMeta('meta[name="description"]', { name: "description" }, page.description);
+    upsertMeta('meta[name="robots"]', { name: "robots" }, robots);
+    upsertMeta('meta[property="og:title"]', { property: "og:title" }, page.title);
+    upsertMeta('meta[property="og:description"]', { property: "og:description" }, page.description);
+    upsertMeta('meta[property="og:url"]', { property: "og:url" }, pageUrl);
+    upsertMeta('meta[property="og:image"]', { property: "og:image" }, logoUrl);
+    upsertMeta('meta[property="og:image:alt"]', { property: "og:image:alt" }, `${content.schoolName} logo`);
+    upsertMeta('meta[name="twitter:title"]', { name: "twitter:title" }, page.title);
+    upsertMeta('meta[name="twitter:description"]', { name: "twitter:description" }, page.description);
+    upsertMeta('meta[name="twitter:image"]', { name: "twitter:image" }, logoUrl);
+
+    let canonical = document.head.querySelector<HTMLLinkElement>('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.rel = "canonical";
+      document.head.appendChild(canonical);
+    }
+    canonical.href = pageUrl;
+
+    const previousSchema = document.getElementById("school-seo-schema");
+    const schema = {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "School",
+          "@id": `${origin}/#school`,
+          name: content.schoolName,
+          alternateName: "MGPS",
+          url: origin,
+          logo: logoUrl,
+          image: logoUrl,
+          description: seoPages["/"].description,
+          telephone: content.phone,
+          email: content.email,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: content.address,
+            addressLocality: "Muzaffarpur",
+            addressRegion: "Bihar",
+            postalCode: "842004",
+            addressCountry: "IN",
+          },
+          areaServed: { "@type": "City", name: "Muzaffarpur" },
+          knowsLanguage: ["English", "Hindi"],
+        },
+        {
+          "@type": "WebSite",
+          "@id": `${origin}/#website`,
+          url: origin,
+          name: content.schoolName,
+          publisher: { "@id": `${origin}/#school` },
+          inLanguage: "en-IN",
+        },
+        {
+          "@type": "WebPage",
+          "@id": `${pageUrl}#webpage`,
+          url: pageUrl,
+          name: page.title,
+          description: page.description,
+          isPartOf: { "@id": `${origin}/#website` },
+          about: { "@id": `${origin}/#school` },
+          inLanguage: "en-IN",
+        },
+      ],
+    };
+    const schemaTag = previousSchema || document.createElement("script");
+    schemaTag.id = "school-seo-schema";
+    schemaTag.setAttribute("type", "application/ld+json");
+    schemaTag.textContent = JSON.stringify(schema);
+    if (!previousSchema) document.head.appendChild(schemaTag);
+  }, [content, noIndex, path]);
+  return null;
+}
+
 const publicNav = [
   ["Home", "/"],
   ["About Us", "/about"],
@@ -1046,8 +1203,10 @@ function MobileCta() {
   );
 }
 function Shell({ children }: { children: ReactNode }) {
+  const [location] = useLocation();
   return (
     <div className="site-shell">
+      <SeoMetadata path={location} />
       <Header />
       <main>{children}</main>
       <Footer />
@@ -2236,6 +2395,7 @@ function NotFound() {
   const [, setLocation] = useLocation();
   return (
     <div className="not-found">
+      <SeoMetadata path="/404" noIndex />
       <div>
         <div className="eyebrow">Page not found</div>
         <h1 className="section-heading">Let’s return to the school.</h1>
