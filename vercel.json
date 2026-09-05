@@ -4,6 +4,9 @@
   "buildCommand": "pnpm --filter @workspace/api-server build && pnpm --filter @workspace/mgps-school build",
   "outputDirectory": "artifacts/mgps-school/public",
   "routes": [
+    { "src": "/api/auth/login", "dest": "/api/auth/index.js" },
+    { "src": "/api/auth/session", "dest": "/api/auth/index.js" },
+    { "src": "/api/auth/logout", "dest": "/api/auth/index.js" },
     { "src": "/api/(.*)", "dest": "/api/index.js" },
     { "handle": "filesystem" },
     { "src": "/(.*)", "dest": "/index.html" }
